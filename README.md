@@ -1,3 +1,19 @@
+# How to setup dev environment
+
+```shell
+poetry install
+```
+
+# How to run
+
+Run elastic search and redis
+
+Run this server
+
+```shell
+python src/main.py
+```
+
 # Техническое задание
 
 Предлагается выполнить проект «Асинхронное API». Этот сервис будет точкой входа для всех клиентов. В первой итерации в сервисе будут только анонимные пользователи. Функции авторизации и аутентификации запланированы в модуле «Auth».
