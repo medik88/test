@@ -1,4 +1,4 @@
-import uuid
+from uuid import UUID
 from typing import List
 
 from fastapi import APIRouter
@@ -8,7 +8,7 @@ router = APIRouter()
 
 
 class Genre(BaseModel):
-    uuid: uuid.UUID
+    uuid: UUID
     name: str
 
 
@@ -21,6 +21,6 @@ async def genre_list() -> List[Genre]:
 
 
 @router.get('/{genre_uuid}', response_model=Genre)
-async def genre_details(genre_uuid: uuid.UUID) -> Genre:
+async def genre_details(genre_uuid: UUID) -> Genre:
     # todo add getting genre info here
     return Genre(uuid=genre_uuid, name='Action')
