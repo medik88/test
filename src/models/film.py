@@ -1,5 +1,6 @@
 import orjson
 
+from uuid import UUID
 from typing import Dict, List
 
 from pydantic import BaseModel
@@ -17,37 +18,28 @@ class LocalBaseModel(BaseModel):
 
 
 class Film(LocalBaseModel):
-    id: str
+    uuid: UUID
     title: str
-    work_type: str
-    description: str
     imdb_rating: float
+    description: str
+    genres: List[Dict[UUID, str]]
+    actors: List[Dict[UUID, str]]
+    writers: List[Dict[UUID, str]]
+    directors: List[Dict[UUID, str]]
+    work_type: str
     creation_date: str
-    actors: Dict[str, str]
-    directors: Dict[str, str]
-    writers: Dict[str, str]
     actors_names: List[str]
     directors_names: List[str]
     writers_names: List[str]
-    genres: List[str]
 
 
 class Genre(LocalBaseModel):
+    uuid: uuid.UUID
     name: str
 
 
 class Person(LocalBaseModel):
-    id: str
-    name: str
-
-
-class Actor(Person):
-    profession: str = 'Actor'
-
-
-class Writer(Person):
-    profession: str = 'Writer'
-
-
-class Director(Person):
-    profession: str = 'Director'
+    uuid: UUID
+    full_name: str
+    role: str
+    film_ids: List[UUID]
