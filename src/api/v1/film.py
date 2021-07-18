@@ -1,5 +1,7 @@
 from http import HTTPStatus
 
+from typing import Dict, List
+
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
