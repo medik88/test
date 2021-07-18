@@ -1,5 +1,5 @@
+from uuid import UUID
 from http import HTTPStatus
-
 from typing import Dict, List
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -10,47 +10,31 @@ from services.film import FilmService, get_film_service
 router = APIRouter()
 
 
-class Film(BaseModel):
-    id: str
+class BaseFilm(BaseModel):
+    uuid: UUID
     title: str
-    work_type: str
-    description: str
     imdb_rating: float
-    creation_date: str
-    actors: Dict[str, str]
-    directors: Dict[str, str]
-    writers: Dict[str, str]
-    actors_names: List[str]
-    directors_names: List[str]
-    writers_names: List[str]
-    genres: List[str]
 
 
-class Genre(BaseModel):
-    name: str
+class Film(BaseFilm):
+    description: str
+    genres: List[Dict[UUID, str]]
+    actors: List[Dict[UUID, str]]
+    writers: List[Dict[UUID, str]]
+    directors: List[Dict[UUID, str]]
 
 
-class Person(BaseModel):
-    id: str
-    name: str
+@router.get('/', response_model=List[BaseFilm])  #TODO
+async def film_full_list() -> List[BaseFilm]:
+    pass
 
-
-class Actor(Person):
-    profession: str = 'Actor'
-
-
-class Writer(Person):
-    profession: str = 'Writer'
-
-
-class Director(Person):
-    profession: str = 'Director'
-
-
-@router.get('/{film_id}', response_model=Film)
-async def film_details(film_id: str, film_service: FilmService = Depends(get_film_service)) -> Film:
-    film = await film_service.get_by_id(film_id)
+@router.get('/{uuid}', response_model=Film)
+async def film_details(uuid: str, film_service: FilmService = Depends(get_film_service)) -> Film:
+    film = await film_service.get_by_id(uuid)
     if not film:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='film not found')
+    return Film(uuid=film.uuid, title=film.title)  #TODO: полностью все поля должны заполняться
 
-    return Film(id=film.id, title=film.title)
+@router.get('/search', response_model=List[BaseFilm])  #TODO
+async def film_search_list() -> List[BaseFilm]:
+    pass
