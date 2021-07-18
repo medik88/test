@@ -34,7 +34,7 @@ class Film(LocalBaseModel):
 
 
 class Genre(LocalBaseModel):
-    uuid: uuid.UUID
+    uuid: UUID
     name: str
 
 
