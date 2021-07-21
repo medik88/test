@@ -1,8 +1,7 @@
-import orjson
-
+from typing import List
 from uuid import UUID
-from typing import Dict, List
 
+import orjson
 from pydantic import BaseModel
 
 
@@ -11,26 +10,9 @@ def orjson_dumps(v, *, default):
 
 
 class LocalBaseModel(BaseModel):
-
     class Config:
         json_loads = orjson.loads
         json_dumps = orjson_dumps
-
-
-class Film(LocalBaseModel):
-    uuid: UUID
-    title: str
-    imdb_rating: float
-    description: str
-    genres: List[Dict[UUID, str]]
-    actors: List[Dict[UUID, str]]
-    writers: List[Dict[UUID, str]]
-    directors: List[Dict[UUID, str]]
-    work_type: str
-    creation_date: str
-    actors_names: List[str]
-    directors_names: List[str]
-    writers_names: List[str]
 
 
 class Genre(LocalBaseModel):
@@ -40,6 +22,32 @@ class Genre(LocalBaseModel):
 
 class Person(LocalBaseModel):
     uuid: UUID
-    full_name: str
+    name: str
     role: str
     film_ids: List[UUID]
+
+
+class PersonShort(LocalBaseModel):
+    uid: UUID
+    name: str
+
+
+class GenreShort(LocalBaseModel):
+    uid: UUID
+    name: str
+
+
+class Film(LocalBaseModel):
+    uuid: UUID
+    title: str
+    imdb_rating: float
+    description: str
+    genres: List[GenreShort]
+    actors: List[PersonShort]
+    writers: List[PersonShort]
+    directors: List[PersonShort]
+    work_type: str
+    created: str
+    actors_names: List[str]
+    directors_names: List[str]
+    writers_names: List[str]
