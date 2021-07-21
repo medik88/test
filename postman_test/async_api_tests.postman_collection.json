@@ -1,0 +1,619 @@
+{
+	"info": {
+		"_postman_id": "764f1234-8aba-48c1-94c0-39a30950a089",
+		"name": "async api tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GET genre_details",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const schema = {\r",
+							"    \"type\": \"object\",\r",
+							"    \"properties\": {\r",
+							"        \"uuid\": { \"type\": \"string\" },\r",
+							"        \"name\": { \"type\": \"string\" }\r",
+							"    },\r",
+							"    \"required\": [\"uuid\", \"name\"]\r",
+							"};\r",
+							"\r",
+							"\r",
+							"pm.test(\"Status test\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate schema\", () => {\r",
+							"    pm.response.to.have.jsonSchema(schema);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{address}}/api/v1/genre/{{genre_uuid}}",
+					"host": [
+						"{{address}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"genre",
+						"{{genre_uuid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET genre_detailes invalid uuid",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status test\", function () {\r",
+							"    pm.response.to.have.status(422);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{address}}/api/v1/genre/123",
+					"host": [
+						"{{address}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"genre",
+						"123"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET genre_detailes wrong uuid",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status test\", function () {\r",
+							"    pm.response.to.have.status(404);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{address}}/api/v1/genre/4e47afa1-aab3-43ad-be8a-82bbc9a33d65",
+					"host": [
+						"{{address}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"genre",
+						"4e47afa1-aab3-43ad-be8a-82bbc9a33d65"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET genre_list",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const item_schema = {\r",
+							"    \"type\": \"object\",\r",
+							"    \"properties\": {\r",
+							"        \"uuid\": { \"type\": \"string\" },\r",
+							"        \"name\": { \"type\": \"string\" }\r",
+							"    },\r",
+							"    \"required\": [\"uuid\", \"name\"]\r",
+							"};\r",
+							"\r",
+							"const schema = {\r",
+							"    \"type\": \"array\",\r",
+							"    \"items\": item_schema\r",
+							"};\r",
+							"\r",
+							"\r",
+							"pm.test(\"Status test\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate schema\", () => {\r",
+							"    pm.response.to.have.jsonSchema(schema);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{address}}/api/v1/genre/",
+					"host": [
+						"{{address}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"genre",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET person_details",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const schema_film_ids = {\r",
+							"    \"type\": \"array\",\r",
+							"    \"items\": {\"type\": \"string\"}\r",
+							"};\r",
+							"\r",
+							"const schema = {\r",
+							"    \"type\": \"object\",\r",
+							"    \"properties\": {\r",
+							"        \"uuid\": { \"type\": \"string\" },\r",
+							"        \"full_name\": { \"type\": \"string\" },\r",
+							"        \"role\": { \"type\": \"string\" },\r",
+							"        \"film_ids\": schema_film_ids\r",
+							"    },\r",
+							"    \"required\": [\"uuid\", \"full_name\", \"role\", \"film_ids\"]\r",
+							"};\r",
+							"\r",
+							"\r",
+							"pm.test(\"Status test\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate schema\", () => {\r",
+							"    pm.response.to.have.jsonSchema(schema);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{address}}/api/v1/person/{{person_uuid}}",
+					"host": [
+						"{{address}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"person",
+						"{{person_uuid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET person_details invalid uuid",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status test\", function () {\r",
+							"    pm.response.to.have.status(422);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{address}}/api/v1/person/123",
+					"host": [
+						"{{address}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"person",
+						"123"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET person_details wrong uuid",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status test\", function () {\r",
+							"    pm.response.to.have.status(404);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{address}}/api/v1/person/4e47afa1-aab3-43ad-be8a-82bbc9a33d67",
+					"host": [
+						"{{address}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"person",
+						"4e47afa1-aab3-43ad-be8a-82bbc9a33d67"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET person_films",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const schema_film_base = {\r",
+							"    \"type\": \"object\",\r",
+							"    \"properties\": {\r",
+							"        \"uuid\": { \"type\": \"string\" },\r",
+							"        \"title\": { \"type\": \"string\" },\r",
+							"        \"imdb_rating\": { \"type\": \"number\"}\r",
+							"    },\r",
+							"    \"required\": [\"uuid\", \"title\", \"imdb_rating\"]\r",
+							"};\r",
+							"\r",
+							"const schema = {\r",
+							"    \"type\": \"array\",\r",
+							"    \"items\": schema_film_base\r",
+							"};\r",
+							"\r",
+							"\r",
+							"pm.test(\"Status test\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate schema\", () => {\r",
+							"    pm.response.to.have.jsonSchema(schema);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{address}}/api/v1/person/{{person_uuid}}/film",
+					"host": [
+						"{{address}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"person",
+						"{{person_uuid}}",
+						"film"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET person_films invalid uuid",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status test\", function () {\r",
+							"    pm.response.to.have.status(422);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{address}}/api/v1/person/123/film",
+					"host": [
+						"{{address}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"person",
+						"123",
+						"film"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET person_films wrong uuid",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status test\", function () {\r",
+							"    pm.response.to.have.status(404);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{address}}/api/v1/person/4e47afa1-aab3-43ad-be8a-82bbc9a33d67/film",
+					"host": [
+						"{{address}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"person",
+						"4e47afa1-aab3-43ad-be8a-82bbc9a33d67",
+						"film"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET person_search",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const schema_film_ids = {\r",
+							"    \"type\": \"array\",\r",
+							"    \"items\": {\"type\": \"string\"}\r",
+							"};\r",
+							"\r",
+							"const schema_person = {\r",
+							"    \"type\": \"object\",\r",
+							"    \"properties\": {\r",
+							"        \"uuid\": { \"type\": \"string\" },\r",
+							"        \"full_name\": { \"type\": \"string\" },\r",
+							"        \"role\": { \"type\": \"string\" },\r",
+							"        \"film_ids\": schema_film_ids\r",
+							"    },\r",
+							"    \"required\": [\"uuid\", \"full_name\", \"role\", \"film_ids\"]\r",
+							"};\r",
+							"\r",
+							"const schema = {\r",
+							"    \"type\": \"array\",\r",
+							"    \"items\": schema_person\r",
+							"};\r",
+							"\r",
+							"pm.test(\"Status test\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate schema\", () => {\r",
+							"    pm.response.to.have.jsonSchema(schema);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{address}}/api/v1/person/search?query=jim&page[number]=1&page[size]=50",
+					"host": [
+						"{{address}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"person",
+						"search"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "jim"
+						},
+						{
+							"key": "page[number]",
+							"value": "1"
+						},
+						{
+							"key": "page[size]",
+							"value": "50"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET person_search invalid page size",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status test\", function () {\r",
+							"    pm.response.to.have.status(422);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{address}}/api/v1/person/search?query=jim&page[number]=1&page[size]=0",
+					"host": [
+						"{{address}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"person",
+						"search"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "jim"
+						},
+						{
+							"key": "page[number]",
+							"value": "1"
+						},
+						{
+							"key": "page[size]",
+							"value": "0"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET person_search invalid page number",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status test\", function () {\r",
+							"    pm.response.to.have.status(422);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{address}}/api/v1/person/search?query=jim&page[number]=0&page[size]=50",
+					"host": [
+						"{{address}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"person",
+						"search"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "jim"
+						},
+						{
+							"key": "page[number]",
+							"value": "0"
+						},
+						{
+							"key": "page[size]",
+							"value": "50"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "genre_uuid",
+			"value": "b97b21fc-98fd-4f6c-acd2-518740052ff3"
+		},
+		{
+			"key": "address",
+			"value": "http://127.0.0.1:8001"
+		},
+		{
+			"key": "person_uuid",
+			"value": "9cd23157-5eae-41ad-a0d8-431facdeeeed"
+		}
+	]
+}

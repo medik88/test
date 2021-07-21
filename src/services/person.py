@@ -25,10 +25,14 @@ class PersonService:
             return None
         person = Person(**doc['_source'], uuid=doc['_id'], role='', film_ids=[])
         films_for_person = await self._get_films_for_person_from_elastic(person_id)
+        if not films_for_person:
+            return None
         person.film_ids = [film.uuid for film in films_for_person]
         return person
 
     async def get_films_for_person(self, person_id: str) -> List[Film]:
+        if not await self.get_by_id(person_id):
+            return None
         return await self._get_films_for_person_from_elastic(person_id)
 
     async def search_persons(self, query: str, page_number: int, page_size: int) -> List[Film]:
@@ -104,7 +108,7 @@ class PersonService:
                 }
             )
         except elasticsearch.exceptions.NotFoundError:
-            return []
+            return None
         return [Film(**doc['_source'], uuid=doc['_id']) for doc in result['hits']['hits']]
 
 
