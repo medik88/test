@@ -58,6 +58,15 @@ class Film(BaseFilm):
         return film
 
 
+@router.get('/search', response_model=List[BaseFilm])
+async def film_search_list(
+        query: str = Query(..., min_length=2),
+        page_number: int = Query(..., alias='page[number]', ge=1),
+        page_size: int = Query(..., alias='page[size]', ge=1)
+) -> List[BaseFilm]:
+    # todo add implementation
+    pass
+
 @router.get('/', response_model=List[BaseFilm])
 async def film_full_list() -> List[BaseFilm]:
     # todo add implementation
@@ -72,11 +81,3 @@ async def film_details(uuid: str, film_service: FilmService = Depends(get_film_s
     return Film.from_service_model(film)
 
 
-@router.get('/search', response_model=List[BaseFilm])
-async def film_search_list(
-        query: str = Query(..., min_length=2),
-        page_number: int = Query(..., alias='page[number]', ge=1),
-        page_size: int = Query(..., alias='page[size]', ge=1)
-) -> List[BaseFilm]:
-    # todo add implementation
-    pass
