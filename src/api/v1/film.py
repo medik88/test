@@ -1,3 +1,4 @@
+import typing
 from http import HTTPStatus
 from typing import List
 from uuid import UUID
@@ -5,6 +6,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 
+from core import config
 from models.film import Film as ServiceFilm
 from services.film import FilmService, get_film_service
 
@@ -61,16 +63,26 @@ class Film(BaseFilm):
 @router.get('/search', response_model=List[BaseFilm])
 async def film_search_list(
         query: str = Query(..., min_length=2),
-        page_number: int = Query(..., alias='page[number]', ge=1),
-        page_size: int = Query(..., alias='page[size]', ge=1)
+        page_number: typing.Optional[int] = Query(1, alias='page[number]', ge=1),
+        page_size: typing.Optional[int] = Query(config.PAGE_SIZE, alias='page[size]', ge=1),
+        film_service: FilmService = Depends(get_film_service)
 ) -> List[BaseFilm]:
-    # todo add implementation
-    pass
+    model_films = await film_service.search(query, page_number, page_size)
+    if model_films:
+        return [BaseFilm(uuid=f.uuid, title=f.title, imdb_rating=f.imdb_rating) for f in model_films]
+    return []
+
 
 @router.get('/', response_model=List[BaseFilm])
-async def film_full_list() -> List[BaseFilm]:
-    # todo add implementation
-    pass
+async def film_full_list(
+        page_number: typing.Optional[int] = Query(1, alias='page[number]', ge=1),
+        page_size: typing.Optional[int] = Query(config.PAGE_SIZE, alias='page[size]', ge=1),
+        film_service: FilmService = Depends(get_film_service)
+) -> List[BaseFilm]:
+    model_films = await film_service.get_page(page_number, page_size)
+    if model_films:
+        return [BaseFilm(uuid=f.uuid, title=f.title, imdb_rating=f.imdb_rating) for f in model_films]
+    return []
 
 
 @router.get('/{uuid}', response_model=Film)
@@ -79,5 +91,3 @@ async def film_details(uuid: str, film_service: FilmService = Depends(get_film_s
     if not film:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='film not found')
     return Film.from_service_model(film)
-
-
