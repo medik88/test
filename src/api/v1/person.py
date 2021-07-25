@@ -6,7 +6,8 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 
-from api.v1.film import BaseFilm
+from models.film import FilmForPerson as ServiceFilmForPerson
+from models.film import Person as ServicePerson
 from services.person import PersonService, get_person_service
 
 router = APIRouter()
@@ -14,11 +15,37 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
+class FilmForPerson(BaseModel):
+    uuid: UUID
+    title: str
+    imdb_rating: float
+
+    @staticmethod
+    def from_service_model(other: ServiceFilmForPerson):
+        film = FilmForPerson(
+            uuid=other.uid,
+            title=other.title,
+            imdb_rating=other.imdb_rating,
+        )
+        return film
+
+
 class Person(BaseModel):
     uuid: UUID
     full_name: str
-    role: str
-    film_ids: List[UUID]
+    films: List[FilmForPerson]
+
+    @staticmethod
+    def from_service_person(other: ServicePerson):
+        films = []
+        if other.filmworks:
+            films = [FilmForPerson.from_service_model(filmwork) for filmwork in other.filmworks]
+        person = Person(
+            uuid=other.uuid,
+            full_name=other.name,
+            films=films
+        )
+        return person
 
 
 @router.get('/search', response_model=List[Person])
@@ -29,21 +56,27 @@ async def person_search_list(
         person_service: PersonService = Depends(get_person_service)
 ) -> List[Person]:
     persons = await person_service.search_persons(query, page_number, page_size)
-    return [Person(uuid=person.uuid, full_name=person.name, role=person.role, film_ids=person.film_ids) for person in
-            persons]
+    return [Person.from_service_person(person) for person in persons]
 
 
 @router.get('/{uuid}', response_model=Person)
-async def person_details(uuid: UUID, person_service: PersonService = Depends(get_person_service)) -> Person:
+async def person_details(
+        uuid: UUID,
+        person_service: PersonService = Depends(get_person_service)
+) -> Person:
     person = await person_service.get_by_id(uuid)
     if not person:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='person not found')
-    return Person(uuid=person.uuid, full_name=person.name, role=person.role, film_ids=person.film_ids)
+    return Person.from_service_person(person)
 
 
-@router.get('/{uuid}/film', response_model=List[BaseFilm])
-async def films_by_person(uuid: UUID, person_service: PersonService = Depends(get_person_service)) -> List[BaseFilm]:
+@router.get('/{uuid}/film', response_model=List[FilmForPerson])
+async def films_by_person(
+        uuid: UUID,
+        person_service: PersonService = Depends(get_person_service)
+) -> List[
+    FilmForPerson]:
     films = await person_service.get_films_for_person(uuid)
     if films is None:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='person not found')
-    return [BaseFilm(uuid=film.uuid, title=film.title, imdb_rating=film.imdb_rating) for film in films]
+    return [FilmForPerson.from_service_model(film) for film in films]

@@ -8,7 +8,7 @@ from fastapi import Depends
 
 from db.elastic import get_elastic
 from db.redis import get_redis
-from models.film import Person, Film
+from models.film import Person, FilmForPerson
 
 
 class PersonService:
@@ -19,23 +19,13 @@ class PersonService:
         self.movies_index_name = 'movies'
 
     async def get_by_id(self, person_id: str) -> Optional[Person]:
-        try:
-            doc = await self.elastic.get(self.index_name, person_id)
-        except elasticsearch.exceptions.NotFoundError:
-            return None
-        person = Person(**doc['_source'], uuid=doc['_id'], role='', film_ids=[])
-        films_for_person = await self._get_films_for_person_from_elastic(person_id)
-        if not films_for_person:
-            return None
-        person.film_ids = [film.uuid for film in films_for_person]
-        return person
+        return await self._get_person_from_elastic(person_id)
 
-    async def get_films_for_person(self, person_id: str) -> List[Film]:
-        if not await self.get_by_id(person_id):
-            return None
-        return await self._get_films_for_person_from_elastic(person_id)
+    async def get_films_for_person(self, person_id: str) -> List[FilmForPerson]:
+        person = await self._get_person_from_elastic(person_id)
+        return person.filmworks if person else None
 
-    async def search_persons(self, query: str, page_number: int, page_size: int) -> List[Film]:
+    async def search_persons(self, query: str, page_number: int, page_size: int) -> List[Person]:
         size = page_size
         offset = (page_number - 1) * page_size
         result = await self.elastic.search(
@@ -54,62 +44,15 @@ class PersonService:
                 }
             }
         )
-
-        persons = [Person(**doc['_source'], uuid=doc['_id'], role='', film_ids=[]) for doc in result['hits']['hits']]
+        persons = [Person(**item['_source'], uuid=item['_id']) for item in result['hits']['hits']]
         return persons
 
-    async def _get_films_for_person_from_elastic(self, person_uuid) -> List[Film]:
+    async def _get_person_from_elastic(self, perosn_id: str) -> Optional[Person]:
         try:
-            result = await self.elastic.search(
-                index=self.movies_index_name,
-                body={
-                    "query": {
-                        "bool": {
-                            "should": [
-
-                                {
-                                    "nested": {
-                                        "path": "actors",
-                                        "query": {
-                                            "bool": {
-                                                "filter": [
-                                                    {"term": {"actors.uid": person_uuid}}
-                                                ]
-                                            }
-
-                                        }
-                                    }
-                                },
-                                {"nested": {
-                                    "path": "writers",
-                                    "query": {
-                                        "bool": {
-                                            "filter": [
-                                                {"term": {"writers.uid": person_uuid}}
-                                            ]
-                                        }
-
-                                    }
-                                }},
-                                {"nested": {
-                                    "path": "directors",
-                                    "query": {
-                                        "bool": {
-                                            "filter": [
-                                                {"term": {"directors.uid": person_uuid}}
-                                            ]
-                                        }
-
-                                    }
-                                }}
-                            ]
-                        }
-                    }
-                }
-            )
+            doc = await self.elastic.get(self.index_name, perosn_id)
         except elasticsearch.exceptions.NotFoundError:
             return None
-        return [Film(**doc['_source'], uuid=doc['_id']) for doc in result['hits']['hits']]
+        return Person(**doc['_source'], uuid=doc['_id'])
 
 
 @lru_cache()

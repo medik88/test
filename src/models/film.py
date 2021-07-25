@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from uuid import UUID
 
 import orjson
@@ -19,12 +19,15 @@ class Genre(LocalBaseModel):
     uuid: UUID
     name: str
 
+class FilmForPerson(LocalBaseModel):
+    uid: UUID
+    title: str
+    imdb_rating: float
 
 class Person(LocalBaseModel):
     uuid: UUID
     name: str
-    role: str
-    film_ids: List[UUID]
+    filmworks: Optional[List[FilmForPerson]]
 
 
 class PersonShort(LocalBaseModel):
