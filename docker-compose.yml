@@ -12,7 +12,9 @@ services:
         - 9200:9200
     restart: always
   api:
-    image: ./docker/api/
+    build:
+        context: .
+        dockerfile: ./docker/api/Dockerfile
     command: python main.py
     ports: 
         - 8000:8000
