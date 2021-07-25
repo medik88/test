@@ -14,6 +14,16 @@ Run this server
 python src/main.py
 ```
 
+# Run postman tests
+
+Install [newman tool](https://learning.postman.com/docs/running-collections/using-newman-cli/command-line-integration-with-newman/) to run postman tests from terminal.
+
+Run tests
+
+```shell
+make test
+```
+
 # Техническое задание
 
 Предлагается выполнить проект «Асинхронное API». Этот сервис будет точкой входа для всех клиентов. В первой итерации в сервисе будут только анонимные пользователи. Функции авторизации и аутентификации запланированы в модуле «Auth».
