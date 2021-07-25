@@ -177,9 +177,19 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"const schema_film_ids = {\r",
+							"const schema_film_base = {\r",
+							"    \"type\": \"object\",\r",
+							"    \"properties\": {\r",
+							"        \"uuid\": { \"type\": \"string\" },\r",
+							"        \"title\": { \"type\": \"string\" },\r",
+							"        \"imdb_rating\": { \"type\": \"number\"}\r",
+							"    },\r",
+							"    \"required\": [\"uuid\", \"title\", \"imdb_rating\"]\r",
+							"};\r",
+							"\r",
+							"const schema_films = {\r",
 							"    \"type\": \"array\",\r",
-							"    \"items\": {\"type\": \"string\"}\r",
+							"    \"items\": schema_film_base\r",
 							"};\r",
 							"\r",
 							"const schema = {\r",
@@ -187,10 +197,9 @@
 							"    \"properties\": {\r",
 							"        \"uuid\": { \"type\": \"string\" },\r",
 							"        \"full_name\": { \"type\": \"string\" },\r",
-							"        \"role\": { \"type\": \"string\" },\r",
-							"        \"film_ids\": schema_film_ids\r",
+							"        \"films\": schema_films\r",
 							"    },\r",
-							"    \"required\": [\"uuid\", \"full_name\", \"role\", \"film_ids\"]\r",
+							"    \"required\": [\"uuid\", \"full_name\", \"films\"]\r",
 							"};\r",
 							"\r",
 							"\r",
@@ -421,9 +430,19 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"const schema_film_ids = {\r",
+							"const schema_film_base = {\r",
+							"    \"type\": \"object\",\r",
+							"    \"properties\": {\r",
+							"        \"uuid\": { \"type\": \"string\" },\r",
+							"        \"title\": { \"type\": \"string\" },\r",
+							"        \"imdb_rating\": { \"type\": \"number\"}\r",
+							"    },\r",
+							"    \"required\": [\"uuid\", \"title\", \"imdb_rating\"]\r",
+							"};\r",
+							"\r",
+							"const schema_films = {\r",
 							"    \"type\": \"array\",\r",
-							"    \"items\": {\"type\": \"string\"}\r",
+							"    \"items\": schema_film_base\r",
 							"};\r",
 							"\r",
 							"const schema_person = {\r",
@@ -431,10 +450,9 @@
 							"    \"properties\": {\r",
 							"        \"uuid\": { \"type\": \"string\" },\r",
 							"        \"full_name\": { \"type\": \"string\" },\r",
-							"        \"role\": { \"type\": \"string\" },\r",
-							"        \"film_ids\": schema_film_ids\r",
+							"        \"films\": schema_films\r",
 							"    },\r",
-							"    \"required\": [\"uuid\", \"full_name\", \"role\", \"film_ids\"]\r",
+							"    \"required\": [\"uuid\", \"full_name\", \"films\"]\r",
 							"};\r",
 							"\r",
 							"const schema = {\r",
@@ -459,7 +477,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{address}}/api/v1/person/search?query=jim&page[number]=1&page[size]=50",
+					"raw": "{{address}}/api/v1/person/search?query={{person_name}}&page[number]=1&page[size]=50",
 					"host": [
 						"{{address}}"
 					],
@@ -472,7 +490,7 @@
 					"query": [
 						{
 							"key": "query",
-							"value": "jim"
+							"value": "{{person_name}}"
 						},
 						{
 							"key": "page[number]",
@@ -506,7 +524,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{address}}/api/v1/person/search?query=jim&page[number]=1&page[size]=0",
+					"raw": "{{address}}/api/v1/person/search?query={{person_name}}&page[number]=1&page[size]=0",
 					"host": [
 						"{{address}}"
 					],
@@ -519,7 +537,7 @@
 					"query": [
 						{
 							"key": "query",
-							"value": "jim"
+							"value": "{{person_name}}"
 						},
 						{
 							"key": "page[number]",
@@ -553,7 +571,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{address}}/api/v1/person/search?query=jim&page[number]=0&page[size]=50",
+					"raw": "{{address}}/api/v1/person/search?query={{person_name}}&page[number]=0&page[size]=50",
 					"host": [
 						"{{address}}"
 					],
@@ -566,7 +584,7 @@
 					"query": [
 						{
 							"key": "query",
-							"value": "jim"
+							"value": "{{person_name}}"
 						},
 						{
 							"key": "page[number]",
@@ -609,11 +627,15 @@
 		},
 		{
 			"key": "address",
-			"value": "http://127.0.0.1:8001"
+			"value": "http://127.0.0.1:8000"
 		},
 		{
 			"key": "person_uuid",
-			"value": "9cd23157-5eae-41ad-a0d8-431facdeeeed"
+			"value": "51c58042-72d7-487f-875e-53dd5efdfbc3"
+		},
+		{
+			"key": "person_name",
+			"value": "Lorraine"
 		}
 	]
 }
