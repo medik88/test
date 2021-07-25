@@ -1,5 +1,6 @@
 from functools import lru_cache
 from typing import Optional, List
+from uuid import UUID
 
 import elasticsearch
 from aioredis import Redis
@@ -17,14 +18,14 @@ class GenreService:
         self.elastic = elastic
         self.index_name = 'genres'
 
-    async def get_by_id(self, genre_id: str) -> Optional[Genre]:
+    async def get_by_id(self, genre_id: UUID) -> Optional[Genre]:
         try:
-            doc = await self.elastic.get(self.index_name, genre_id)
+            doc = await self.elastic.get(self.index_name, str(genre_id))
         except elasticsearch.exceptions.NotFoundError:
             return None
         return Genre(**doc['_source'], uuid=doc['_id'])
 
-    async def get_all(self) -> Optional[List[Genre]]:
+    async def get_all(self) -> List[Genre]:
         result = await self.elastic.search(index=self.index_name, body={"query": {"match_all": {}}})
         return [Genre(**doc['_source'], uuid=doc['_id']) for doc in result['hits']['hits']]
 

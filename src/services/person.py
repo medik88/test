@@ -1,5 +1,6 @@
 from functools import lru_cache
 from typing import Optional, List
+from uuid import UUID
 
 import elasticsearch
 from aioredis import Redis
@@ -16,14 +17,13 @@ class PersonService:
         self.redis = redis
         self.elastic = elastic
         self.index_name = 'persons'
-        self.movies_index_name = 'movies'
 
-    async def get_by_id(self, person_id: str) -> Optional[Person]:
+    async def get_by_id(self, person_id: UUID) -> Optional[Person]:
         return await self._get_person_from_elastic(person_id)
 
-    async def get_films_for_person(self, person_id: str) -> List[FilmForPerson]:
+    async def get_films_for_person(self, person_id: UUID) -> List[FilmForPerson]:
         person = await self._get_person_from_elastic(person_id)
-        return person.filmworks if person else None
+        return person.filmworks if person else []
 
     async def search_persons(self, query: str, page_number: int, page_size: int) -> List[Person]:
         size = page_size
@@ -47,9 +47,9 @@ class PersonService:
         persons = [Person(**item['_source'], uuid=item['_id']) for item in result['hits']['hits']]
         return persons
 
-    async def _get_person_from_elastic(self, perosn_id: str) -> Optional[Person]:
+    async def _get_person_from_elastic(self, person_id: UUID) -> Optional[Person]:
         try:
-            doc = await self.elastic.get(self.index_name, perosn_id)
+            doc = await self.elastic.get(self.index_name, str(person_id))
         except elasticsearch.exceptions.NotFoundError:
             return None
         return Person(**doc['_source'], uuid=doc['_id'])

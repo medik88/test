@@ -74,8 +74,7 @@ async def person_details(
 async def films_by_person(
         uuid: UUID,
         person_service: PersonService = Depends(get_person_service)
-) -> List[
-    FilmForPerson]:
+) -> List[FilmForPerson]:
     films = await person_service.get_films_for_person(uuid)
     if films is None:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='person not found')
