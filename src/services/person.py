@@ -23,7 +23,7 @@ class PersonService:
 
     async def get_films_for_person(self, person_id: UUID) -> List[FilmForPerson]:
         person = await self._get_person_from_elastic(person_id)
-        return person.filmworks if person else []
+        return person.filmworks if person else None
 
     async def search_persons(self, query: str, page_number: int, page_size: int) -> List[Person]:
         size = page_size
