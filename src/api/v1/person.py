@@ -36,7 +36,7 @@ class Person(BaseModel):
     films: List[FilmForPerson]
 
     @staticmethod
-    def from_service_person(other: ServicePerson):
+    def from_service_model(other: ServicePerson):
         films = []
         if other.filmworks:
             films = [FilmForPerson.from_service_model(filmwork) for filmwork in other.filmworks]
@@ -56,7 +56,7 @@ async def person_search_list(
         person_service: PersonService = Depends(get_person_service)
 ) -> List[Person]:
     persons = await person_service.search_persons(query, page_number, page_size)
-    return [Person.from_service_person(person) for person in persons]
+    return [Person.from_service_model(person) for person in persons]
 
 
 @router.get('/{uuid}', response_model=Person)
@@ -67,7 +67,7 @@ async def person_details(
     person = await person_service.get_by_id(uuid)
     if not person:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='person not found')
-    return Person.from_service_person(person)
+    return Person.from_service_model(person)
 
 
 @router.get('/{uuid}/film', response_model=List[FilmForPerson])
