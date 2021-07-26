@@ -1,9 +1,10 @@
-import typing
+import uuid
 from functools import lru_cache
 from typing import Optional
 
 from aioredis import Redis
-from elasticsearch import AsyncElasticsearch, exceptions as es_exceptions
+from elasticsearch import AsyncElasticsearch
+from elasticsearch import exceptions as es_exceptions
 from fastapi import Depends
 
 from core import config
@@ -19,48 +20,80 @@ class FilmService:
         self.redis = redis
         self.elastic = elastic
 
-    async def get_page(self, page_number: int = 1, page_size: int = None) -> list[Film]:
+    async def get_page(
+            self,
+            page_number: int = 1,
+            page_size: int = None,
+            sort: str = None,
+            genre_id: uuid.UUID = None,
+    ) -> list[Film]:
+        body = {
+            "query": {
+                "bool": {
+                    "must": [
+                        {"match_all": {}}
+                    ]
+                }
+            }
+        }
+
+        if sort is not None:
+            body["sort"] = self.get_sorting(sort)
+
+        if genre_id is not None:
+            body["query"]["bool"]["filter"] = [{"term": {
+                "genres_ids": genre_id
+            }}]
+
         resp = await self.elastic.search(
             index=config.ELASTIC_MOVIES_INDEX,
-            body={
-                'query': {
-                    'match_all': {}
-                },
-                'sort': {
-                    'imdb_rating': {
-                        'order': 'desc'
-                    }
-                }
-            },
+            body=body,
             size=page_size,
-            from_=page_number * page_size
+            from_=page_number * page_size,
         )
         try:
-            return [Film(uuid=f['_id'], **f['_source']) for f in resp['hits']['hits']]
+            return [Film(uuid=f["_id"], **f["_source"]) for f in resp["hits"]["hits"]]
         except KeyError:
             return []
 
-    async def search(self, query: str, page_number: int = 1, page_size: int = None) -> list[Film]:
+    def get_sorting(self, sort):
+        if sort.startswith("-"):
+            sort_field = sort[1:]
+            order = "desc"
+        else:
+            sort_field = sort
+            order = "asc"
+
+        if sort_field == "title":
+            sort_field = "title.raw"
+
+        return {sort_field: {"order": order}}
+
+    async def search(
+            self, query: str, page_number: int = 1, page_size: int = None
+    ) -> list[Film]:
         resp = await self.elastic.search(
             index=config.ELASTIC_MOVIES_INDEX,
             body={
-                'query': {
-                    'multi_match': {
-                        'query': query,
-                        'fields': ['title', 'description', 'actors_names', 'directors_names', 'writers_names']
+                "query": {
+                    "multi_match": {
+                        "query": query,
+                        "fields": [
+                            "title",
+                            "description",
+                            "actors_names",
+                            "directors_names",
+                            "writers_names",
+                        ],
                     }
                 },
-                'sort': {
-                    'imdb_rating': {
-                        'order': 'desc'
-                    }
-                }
+                "sort": {"imdb_rating": {"order": "desc"}},
             },
             size=page_size,
-            from_=page_number * page_size
+            from_=page_number * page_size,
         )
         try:
-            return [Film(uuid=f['_id'], **f['_source']) for f in resp['hits']['hits']]
+            return [Film(uuid=f["_id"], **f["_source"]) for f in resp["hits"]["hits"]]
         except KeyError:
             return []
 
@@ -85,7 +118,7 @@ class FilmService:
         except es_exceptions.NotFoundError:
             return None
         else:
-            return Film(**doc['_source'], uuid=doc['_id'])
+            return Film(**doc["_source"], uuid=doc["_id"])
 
     async def _film_from_cache(self, film_id: str) -> Optional[Film]:
         # Пытаемся получить данные о фильме из кеша, используя команду get
@@ -103,7 +136,9 @@ class FilmService:
         # Выставляем время жизни кеша — 5 минут
         # https://redis.io/commands/set
         # pydantic позволяет сериализовать модель в json
-        await self.redis.set(str(film.uuid), film.json(), expire=FILM_CACHE_EXPIRE_IN_SECONDS)
+        await self.redis.set(
+            str(film.uuid), film.json(), expire=FILM_CACHE_EXPIRE_IN_SECONDS
+        )
 
 
 @lru_cache()

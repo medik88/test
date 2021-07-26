@@ -78,10 +78,10 @@ async def film_full_list(
         page_number: typing.Optional[int] = Query(1, alias='page[number]', ge=1),
         page_size: typing.Optional[int] = Query(config.PAGE_SIZE, alias='page[size]', ge=1),
         sort: str = Query(None, regex='^-?(?:title|imdb_rating)$'),
-        filter_genre: UUID = Query(None, alias='filter[genre]'),
+        genre_id: UUID = Query(None, alias='filter[genre]'),
         film_service: FilmService = Depends(get_film_service)
 ) -> List[BaseFilm]:
-    model_films = await film_service.get_page(page_number, page_size)
+    model_films = await film_service.get_page(page_number, page_size, sort, genre_id)
     if model_films:
         return [BaseFilm(uuid=f.uuid, title=f.title, imdb_rating=f.imdb_rating) for f in model_films]
     return []
