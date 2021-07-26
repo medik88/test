@@ -1,10 +1,12 @@
+import typing
 from functools import lru_cache
 from typing import Optional
 
 from aioredis import Redis
-from elasticsearch import AsyncElasticsearch
+from elasticsearch import AsyncElasticsearch, exceptions as es_exceptions
 from fastapi import Depends
 
+from core import config
 from db.elastic import get_elastic
 from db.redis import get_redis
 from models.film import Film
@@ -16,6 +18,51 @@ class FilmService:
     def __init__(self, redis: Redis, elastic: AsyncElasticsearch):
         self.redis = redis
         self.elastic = elastic
+
+    async def get_page(self, page_number: int = 1, page_size: int = None) -> list[Film]:
+        resp = await self.elastic.search(
+            index=config.ELASTIC_MOVIES_INDEX,
+            body={
+                'query': {
+                    'match_all': {}
+                },
+                'sort': {
+                    'imdb_rating': {
+                        'order': 'desc'
+                    }
+                }
+            },
+            size=page_size,
+            from_=page_number * page_size
+        )
+        try:
+            return [Film(uuid=f['_id'], **f['_source']) for f in resp['hits']['hits']]
+        except KeyError:
+            return []
+
+    async def search(self, query: str, page_number: int = 1, page_size: int = None) -> list[Film]:
+        resp = await self.elastic.search(
+            index=config.ELASTIC_MOVIES_INDEX,
+            body={
+                'query': {
+                    'multi_match': {
+                        'query': query,
+                        'fields': ['title', 'description', 'actors_names', 'directors_names', 'writers_names']
+                    }
+                },
+                'sort': {
+                    'imdb_rating': {
+                        'order': 'desc'
+                    }
+                }
+            },
+            size=page_size,
+            from_=page_number * page_size
+        )
+        try:
+            return [Film(uuid=f['_id'], **f['_source']) for f in resp['hits']['hits']]
+        except KeyError:
+            return []
 
     # get_by_id возвращает объект фильма. Он опционален, так как фильм может отсутствовать в базе
     async def get_by_id(self, film_id: str) -> Optional[Film]:
@@ -33,8 +80,12 @@ class FilmService:
         return film
 
     async def _get_film_from_elastic(self, film_id: str) -> Optional[Film]:
-        doc = await self.elastic.get('movies', film_id)
-        return Film(**doc['_source'], uuid=doc['_id'])
+        try:
+            doc = await self.elastic.get(config.ELASTIC_MOVIES_INDEX, film_id)
+        except es_exceptions.NotFoundError:
+            return None
+        else:
+            return Film(**doc['_source'], uuid=doc['_id'])
 
     async def _film_from_cache(self, film_id: str) -> Optional[Film]:
         # Пытаемся получить данные о фильме из кеша, используя команду get
