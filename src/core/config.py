@@ -17,6 +17,8 @@ REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
 ELASTIC_HOST = os.getenv('ELASTIC_HOST', 'elastic')
 ELASTIC_PORT = int(os.getenv('ELASTIC_PORT', 9200))
 ELASTIC_MOVIES_INDEX = os.getenv('ELASTIC_MOVIES_INDEX', 'movies')
+ELASTIC_PERSONS_INDEX = os.getenv('ELASTIC_PERSONS_INDEX', 'persons')
+ELASTIC_GENRES_INDEX = os.getenv('ELASTIC_GENRES_INDEX', 'genres')
 
 # Корень проекта
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

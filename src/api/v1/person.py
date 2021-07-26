@@ -6,6 +6,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 
+from core import config
 from models.film import FilmForPerson as ServiceFilmForPerson
 from models.film import Person as ServicePerson
 from services.person import PersonService, get_person_service
@@ -51,8 +52,8 @@ class Person(BaseModel):
 @router.get('/search', response_model=List[Person])
 async def person_search_list(
         query: str = Query(..., min_length=2),
-        page_number: int = Query(..., alias='page[number]', ge=1),
-        page_size: int = Query(..., alias='page[size]', ge=1),
+        page_number: int = Query(1, alias='page[number]', ge=1),
+        page_size: int = Query(config.PAGE_SIZE, alias='page[size]', ge=1),
         person_service: PersonService = Depends(get_person_service)
 ) -> List[Person]:
     persons = await person_service.search_persons(query, page_number, page_size)
