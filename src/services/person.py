@@ -7,6 +7,7 @@ from aioredis import Redis
 from elasticsearch import AsyncElasticsearch
 from fastapi import Depends
 
+from core import config
 from db.elastic import get_elastic
 from db.redis import get_redis
 from models.film import Person, FilmForPerson
@@ -16,7 +17,6 @@ class PersonService:
     def __init__(self, redis: Redis, elastic: AsyncElasticsearch):
         self.redis = redis
         self.elastic = elastic
-        self.index_name = 'persons'
 
     async def get_by_id(self, person_id: UUID) -> Optional[Person]:
         return await self._get_person_from_elastic(person_id)
@@ -29,7 +29,7 @@ class PersonService:
         size = page_size
         offset = (page_number - 1) * page_size
         result = await self.elastic.search(
-            index=self.index_name,
+            index=config.ELASTIC_PERSONS_INDEX,
             body={
                 "from": offset,
                 "size": size,
@@ -49,7 +49,7 @@ class PersonService:
 
     async def _get_person_from_elastic(self, person_id: UUID) -> Optional[Person]:
         try:
-            doc = await self.elastic.get(self.index_name, str(person_id))
+            doc = await self.elastic.get(config.ELASTIC_PERSONS_INDEX, str(person_id))
         except elasticsearch.exceptions.NotFoundError:
             return None
         return Person(**doc['_source'], uuid=doc['_id'])
