@@ -6,7 +6,6 @@ RUN apt update \
 EXPOSE 8000/tcp
 WORKDIR /app
 
-# Копируем все приложение в production
 COPY ./movies_admin/requirements /requirements
 RUN pip install pip -U && pip install -r /requirements/production.txt
 COPY ./movies_admin /app

@@ -25,19 +25,17 @@ services:
   etl:
     build:
         context: ./etl
-        dockerfile: ./docker/etl/Dockerfile
+        dockerfile: ../docker/etl/Dockerfile
     container_name: etl_service
     command: python etl.py
     depends_on:
         - postgres
         - elastic
-    env_file:
-        - ./.envs/etl.env
 
   django:
     build:
         context: ./admin_panel
-        dockerfile: ./docker/django/Dockerfile
+        dockerfile: ../docker/django/Dockerfile
     image: production_movies_admin_django
     container_name: production_movies_admin_django
     command: gunicorn config.wsgi --bind 0.0.0.0:8000 --chdir=/app
@@ -50,7 +48,7 @@ services:
   api:
     build:
         context: ./api
-        dockerfile: ./docker/api/Dockerfile
+        dockerfile: ../docker/api/Dockerfile
     command: python main.py
     ports: 
         - 8000:8000
