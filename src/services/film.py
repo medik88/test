@@ -28,21 +28,21 @@ class FilmService:
             genre_id: uuid.UUID = None,
     ) -> list[Film]:
         body = {
-            "query": {
-                "bool": {
-                    "must": [
-                        {"match_all": {}}
+            'query': {
+                'bool': {
+                    'must': [
+                        {'match_all': {}}
                     ]
                 }
             }
         }
 
         if sort is not None:
-            body["sort"] = self.get_sorting(sort)
+            body['sort'] = self._get_sorting(sort)
 
         if genre_id is not None:
-            body["query"]["bool"]["filter"] = [{"term": {
-                "genres_ids": genre_id
+            body['query']['bool']['filter'] = [{'term': {
+                'genres_ids': genre_id
             }}]
 
         resp = await self.elastic.search(
@@ -52,22 +52,23 @@ class FilmService:
             from_=page_number * page_size,
         )
         try:
-            return [Film(uuid=f["_id"], **f["_source"]) for f in resp["hits"]["hits"]]
+            return [Film(uuid=f['_id'], **f['_source']) for f in resp['hits']['hits']]
         except KeyError:
             return []
 
-    def get_sorting(self, sort: str) -> dict[str, dict[str, str]]:
-        if sort.startswith("-"):
+    @staticmethod
+    def _get_sorting(sort: str) -> dict[str, dict[str, str]]:
+        if sort.startswith('-'):
             sort_field = sort[1:]
-            order = "desc"
+            order = 'desc'
         else:
             sort_field = sort
-            order = "asc"
+            order = 'asc'
 
-        if sort_field == "title":
-            sort_field = "title.raw"
+        if sort_field == 'title':
+            sort_field = 'title.raw'
 
-        return {sort_field: {"order": order}}
+        return {sort_field: {'order': order}}
 
     async def search(
             self, query: str, page_number: int = 1, page_size: int = None
@@ -75,25 +76,25 @@ class FilmService:
         resp = await self.elastic.search(
             index=config.ELASTIC_MOVIES_INDEX,
             body={
-                "query": {
-                    "multi_match": {
-                        "query": query,
-                        "fields": [
-                            "title",
-                            "description",
-                            "actors_names",
-                            "directors_names",
-                            "writers_names",
+                'query': {
+                    'multi_match': {
+                        'query': query,
+                        'fields': [
+                            'title',
+                            'description',
+                            'actors_names',
+                            'directors_names',
+                            'writers_names',
                         ],
                     }
                 },
-                "sort": {"imdb_rating": {"order": "desc"}},
+                'sort': {'imdb_rating': {'order': 'desc'}},
             },
             size=page_size,
             from_=page_number * page_size,
         )
         try:
-            return [Film(uuid=f["_id"], **f["_source"]) for f in resp["hits"]["hits"]]
+            return [Film(uuid=f['_id'], **f['_source']) for f in resp['hits']['hits']]
         except KeyError:
             return []
 
@@ -118,7 +119,7 @@ class FilmService:
         except es_exceptions.NotFoundError:
             return None
         else:
-            return Film(**doc["_source"], uuid=doc["_id"])
+            return Film(**doc['_source'], uuid=doc['_id'])
 
     async def _film_from_cache(self, film_id: str) -> Optional[Film]:
         # Пытаемся получить данные о фильме из кеша, используя команду get
