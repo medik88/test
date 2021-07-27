@@ -56,7 +56,7 @@ class FilmService:
         except KeyError:
             return []
 
-    def get_sorting(self, sort):
+    def get_sorting(self, sort: str) -> dict[str, dict[str, str]]:
         if sort.startswith("-"):
             sort_field = sort[1:]
             order = "desc"
