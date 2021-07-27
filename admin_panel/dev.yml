@@ -1,0 +1,60 @@
+version: "3.4"
+
+services:
+
+  django:
+    build:
+      context: .
+      dockerfile: compose/dev/django/Dockerfile
+    image: dev_movies_admin_django
+    container_name: dev_movies_admin_django
+    volumes:
+    - ./movies_admin:/app
+    env_file:
+      - ./.envs/dev/django.env
+      - ./.envs/dev/postgres.env
+    depends_on:
+      - postgres
+    ports:
+    - "8000:8000"
+
+  nginx:
+    image: nginx:1.19.2
+    container_name: dev_movies_admin_nginx
+    volumes:
+    - ./compose/dev/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    - ./compose/dev/nginx/configs:/etc/nginx/conf.d:ro
+    - ./movies_admin/static:/data/static
+    ports:
+    - "80:80"
+    depends_on:
+      - django
+
+  postgres:
+    image: postgres:13
+    container_name: dev_movies_admin_db
+    volumes:
+      - movies_admin_db:/var/lib/postgresql/data
+    env_file:
+      - ./.envs/dev/postgres.env
+
+  elastic:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.13.2
+    container_name: dev_movies_admin_es
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
+
+  etl:
+    build:
+      context: .
+      dockerfile: compose/dev/etl/Dockerfile
+    image: dev_movies_admin_etl
+    container_name: dev_movies_admin_etl
+    env_file:
+      - ./.envs/dev/postgres.env
+    volumes:
+    - ./sqlite_to_postgres:/app
+
+volumes:
+  movies_admin_db:
