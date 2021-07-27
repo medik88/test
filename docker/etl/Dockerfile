@@ -5,5 +5,3 @@ WORKDIR /app
 COPY ./postgres_to_es/requirements.txt /requirements.txt
 RUN pip install pip -U && pip install -r /requirements.txt
 COPY ./postgres_to_es /app
-
-CMD ["python", "etl.py"]

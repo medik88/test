@@ -1,26 +1,71 @@
-version: '3'
+version: '3.4'
+
 services:
+
   redis:
     build: ./docker/redis/
     ports: 
         - 6379:6379
+
+  postgres:
+    image: postgres:13
+    container_name: production_movies_admin_db
+    volumes:
+        - movies_admin_db:/var/lib/postgresql/data
+    env_file:
+        - ./admin_panel/.envs/production/postgres.env
+
   elastic:
     build: ./docker/elastic/
     environment:
         - discovery.type=single-node
     ports: 
         - 9200:9200
-    restart: always
+
+  etl:
+    build:
+        context: ./etl
+        dockerfile: ./docker/etl/Dockerfile
+    container_name: etl_service
+    command: python etl.py
+    depends_on:
+        - postgres
+        - elastic
+    env_file:
+        - ./.envs/etl.env
+
+  django:
+    build:
+        context: ./admin_panel
+        dockerfile: ./docker/django/Dockerfile
+    image: production_movies_admin_django
+    container_name: production_movies_admin_django
+    command: gunicorn config.wsgi --bind 0.0.0.0:8000 --chdir=/app
+    env_file:
+        - ./admin_panel/.envs/production/django.env
+        - ./admin_panel/.envs/production/postgres.env
+    depends_on:
+        - postgres
+
   api:
     build:
-        context: .
+        context: ./api
         dockerfile: ./docker/api/Dockerfile
     command: python main.py
     ports: 
         - 8000:8000
-    restart: always
+
   nginx:
     build: ./docker/nginx/
+    volumes:
+        - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+        - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
+        - ./admin_panel/movies_admin/static:/data/static
     ports:
         - 80:80
-    restart: always
+    depends_on:
+        - django
+        - api
+
+volumes:
+    movies_admin_db:

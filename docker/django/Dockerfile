@@ -10,5 +10,3 @@ WORKDIR /app
 COPY ./movies_admin/requirements /requirements
 RUN pip install pip -U && pip install -r /requirements/production.txt
 COPY ./movies_admin /app
-
-CMD ["/usr/local/bin/gunicorn", "config.wsgi", "--bind", "0.0.0.0:8000", "--chdir=/app"]
