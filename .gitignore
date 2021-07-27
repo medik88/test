@@ -53,3 +53,13 @@ doc.html
 
 # MacOS
 .DS_store
+
+### Django ###
+*.log
+*.pyc
+local_settings.py
+static/
+media/
+
+.env
+db.sqlite3
