@@ -9,7 +9,7 @@ from fastapi import Depends
 
 from core import config
 from db.elastic import get_elastic
-from db.redis import get_redis
+from db.redis import get_redis, redis_cache
 from models.film import Person, FilmForPerson
 
 
@@ -18,13 +18,16 @@ class PersonService:
         self.redis = redis
         self.elastic = elastic
 
+    @redis_cache
     async def get_by_id(self, person_id: UUID) -> Optional[Person]:
         return await self._get_person_from_elastic(person_id)
 
+    @redis_cache
     async def get_films_for_person(self, person_id: UUID) -> List[FilmForPerson]:
         person = await self._get_person_from_elastic(person_id)
         return person.filmworks if person else None
 
+    @redis_cache
     async def search_persons(self, query: str, page_number: int, page_size: int) -> List[Person]:
         size = page_size
         offset = (page_number - 1) * page_size

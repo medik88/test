@@ -9,7 +9,7 @@ from fastapi import Depends
 
 from core import config
 from db.elastic import get_elastic
-from db.redis import get_redis
+from db.redis import get_redis, redis_cache
 from models.film import Genre
 
 
@@ -18,6 +18,7 @@ class GenreService:
         self.redis = redis
         self.elastic = elastic
 
+    @redis_cache
     async def get_by_id(self, genre_id: UUID) -> Optional[Genre]:
         try:
             doc = await self.elastic.get(config.ELASTIC_GENRES_INDEX, str(genre_id))
@@ -25,6 +26,7 @@ class GenreService:
             return None
         return Genre(**doc['_source'], uuid=doc['_id'])
 
+    @redis_cache
     async def get_all(self) -> List[Genre]:
         result = await self.elastic.search(index=config.ELASTIC_GENRES_INDEX, body={"query": {"match_all": {}}})
         return [Genre(**doc['_source'], uuid=doc['_id']) for doc in result['hits']['hits']]

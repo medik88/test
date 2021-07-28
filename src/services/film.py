@@ -1,9 +1,6 @@
 import uuid
-import json
 from functools import lru_cache
 from typing import Optional
-from functools import wraps
-from hashlib import sha1
 
 from aioredis import Redis
 from elasticsearch import AsyncElasticsearch
@@ -12,28 +9,8 @@ from fastapi import Depends
 
 from core import config
 from db.elastic import get_elastic
-from db.redis import get_redis
+from db.redis import get_redis, redis_cache
 from models.film import Film
-
-CACHE_EXPIRE_IN_SECONDS = 60 * 5
-
-
-def cache_decorator(fn):
-    @wraps(fn)
-    async def wrapper(*args, **kwargs):
-        redis = await get_redis()
-        kwd_mark = object()
-        keys = args + (kwd_mark,) + tuple(sorted(kwargs.items()))
-        key = sha1(str(keys).encode()).hexdigest()
-        data = await redis.get(key)
-        if not data:
-            result = await fn(*args, **kwargs)
-            await redis.set(key, json.dumps(result), expire=CACHE_EXPIRE_IN_SECONDS)
-        else:
-            result = json.loads(data)
-        return result
-
-    return wrapper
 
 
 class FilmService:
@@ -41,6 +18,7 @@ class FilmService:
         self.redis = redis
         self.elastic = elastic
 
+    @redis_cache
     async def get_page(
             self,
             page_number: int = 1,
@@ -91,6 +69,7 @@ class FilmService:
 
         return {sort_field: {'order': order}}
 
+    @redis_cache
     async def search(
             self, query: str, page_number: int = 1, page_size: int = None
     ) -> list[Film]:
@@ -119,7 +98,7 @@ class FilmService:
         except KeyError:
             return []
 
-    @cache_decorator
+    @redis_cache
     async def get_by_id(self, film_id: str) -> Optional[Film]:
         try:
             doc = await self.elastic.get(config.ELASTIC_MOVIES_INDEX, film_id)
