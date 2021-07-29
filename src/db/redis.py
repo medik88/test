@@ -7,7 +7,6 @@ redis: Redis = None
 CACHE_EXPIRE_IN_SECONDS = 60 * 5
 
 
-# Функция понадобится при внедрении зависимостей
 async def get_redis() -> Redis:
     return redis
 
@@ -16,8 +15,7 @@ def redis_cache(fn):
     @wraps(fn)
     async def wrapper(*args, **kwargs):
         redis = await get_redis()
-        kwd_mark = object()
-        keys = ('prefix', fn.__name__,) + args + (kwd_mark,) + tuple(sorted(kwargs.items()))
+        keys = ('prefix', fn.__name__,) + args + tuple(sorted(kwargs.items()))
         key = sha1(str(keys).encode()).hexdigest()
         data = await redis.get(key)
         if not data:

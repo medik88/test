@@ -3,19 +3,21 @@ from elasticsearch import AsyncElasticsearch
 from db.redis import redis_cache
 
 
-async def WrappedAsyncElasticsearch(AsyncElasticsearch):
-    @redis_cache
-    def get(self, *args, **kwargs):
-        super().get(args, kwargs)
+class WrappedAsyncElasticsearch(AsyncElasticsearch):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     @redis_cache
-    def search(self, *args, **kwargs):
-        super().get(args, kwargs)
+    async def get(self, *args, **kwargs):
+        return await super().get(*args, **kwargs)
+
+    @redis_cache
+    async def search(self, *args, **kwargs):
+        return await super().search(*args, **kwargs)
 
 
-# Функция понадобится при внедрении зависимостей
+
 async def get_elastic() -> WrappedAsyncElasticsearch:
     return es
-    
 
 es: WrappedAsyncElasticsearch = None
