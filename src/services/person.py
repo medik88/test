@@ -4,17 +4,16 @@ from uuid import UUID
 
 import elasticsearch
 from aioredis import Redis
-from elasticsearch import AsyncElasticsearch
 from fastapi import Depends
 
 from core import config
-from db.elastic import get_elastic
-from db.redis import get_redis
+from db.elastic import get_elastic, WrappedAsyncElasticsearch
+from db.redis import get_redis, redis_cache
 from models.film import Person, FilmForPerson
 
 
 class PersonService:
-    def __init__(self, redis: Redis, elastic: AsyncElasticsearch):
+    def __init__(self, redis: Redis, elastic: WrappedAsyncElasticsearch):
         self.redis = redis
         self.elastic = elastic
 
@@ -58,6 +57,6 @@ class PersonService:
 @lru_cache()
 def get_person_service(
         redis: Redis = Depends(get_redis),
-        elastic: AsyncElasticsearch = Depends(get_elastic),
+        elastic: WrappedAsyncElasticsearch = Depends(get_elastic),
 ) -> PersonService:
     return PersonService(redis, elastic)
