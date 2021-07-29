@@ -4,8 +4,6 @@ from db.redis import redis_cache
 
 
 class WrappedAsyncElasticsearch(AsyncElasticsearch):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
     @redis_cache
     async def get(self, *args, **kwargs):
