@@ -3,22 +3,20 @@ from functools import lru_cache
 from typing import Optional
 
 from aioredis import Redis
-from elasticsearch import AsyncElasticsearch
 from elasticsearch import exceptions as es_exceptions
 from fastapi import Depends
 
 from core import config
-from db.elastic import get_elastic
+from db.elastic import get_elastic, WrappedAsyncElasticsearch
 from db.redis import get_redis, redis_cache
 from models.film import Film
 
 
 class FilmService:
-    def __init__(self, redis: Redis, elastic: AsyncElasticsearch):
+    def __init__(self, redis: Redis, elastic: WrappedAsyncElasticsearch):
         self.redis = redis
         self.elastic = elastic
 
-    @redis_cache
     async def get_page(
             self,
             page_number: int = 1,
@@ -69,7 +67,6 @@ class FilmService:
 
         return {sort_field: {'order': order}}
 
-    @redis_cache
     async def search(
             self, query: str, page_number: int = 1, page_size: int = None
     ) -> list[Film]:
@@ -98,7 +95,6 @@ class FilmService:
         except KeyError:
             return []
 
-    @redis_cache
     async def get_by_id(self, film_id: str) -> Optional[Film]:
         try:
             doc = await self.elastic.get(config.ELASTIC_MOVIES_INDEX, film_id)
@@ -111,6 +107,6 @@ class FilmService:
 @lru_cache()
 def get_film_service(
         redis: Redis = Depends(get_redis),
-        elastic: AsyncElasticsearch = Depends(get_elastic),
+        elastic: WrappedAsyncElasticsearch = Depends(get_elastic),
 ) -> FilmService:
     return FilmService(redis, elastic)
