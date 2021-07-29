@@ -1,10 +1,12 @@
+import orjson
+
 from aioredis import Redis
 from functools import wraps
 from hashlib import sha1
-import json
+
+from core.config import REDIS_CACHE_EXPIRE_S
 
 redis: Redis = None
-CACHE_EXPIRE_IN_SECONDS = 60 * 5
 
 
 async def get_redis() -> Redis:
@@ -20,9 +22,9 @@ def redis_cache(fn):
         data = await redis.get(key)
         if not data:
             result = await fn(*args, **kwargs)
-            await redis.set(key, json.dumps(result), expire=CACHE_EXPIRE_IN_SECONDS)
+            await redis.set(key, orjson.dumps(result), expire=REDIS_CACHE_EXPIRE_S)
         else:
-            result = json.loads(data)
+            result = orjson.loads(data)
         return result
 
     return wrapper
