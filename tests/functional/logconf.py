@@ -20,7 +20,7 @@ LOGGING = {
         },
         'default': {
             'level': 'INFO',
-            'class': 'logging.NullHandler',
+            'class': 'logging.StreamHandler',
             'formatter': 'verbose',
         }
     },
