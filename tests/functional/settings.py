@@ -4,8 +4,9 @@ from pydantic import BaseSettings
 
 
 class Settings(BaseSettings):
-    ELASTIC_HOST: str = 'elasticsearch:9200'
+    ELASTIC_HOST: str = 'elastic:9200'
     REDIS_HOST: str = 'redis'
+    REDIS_DB: str = 0
     REDIS_PORT: str = '6379'
     SERVICE_URL: str = 'http://api:8000'
 
@@ -22,6 +23,9 @@ class Settings(BaseSettings):
             },
             'REDIS_PORT': {
                 'env': 'REDIS_PORT'
+            },
+            'REDIS_DB': {
+                'env': 'REDIS_DB'
             },
             'SERVICE_URL': {
                 'env': 'SERVICE_URL'
