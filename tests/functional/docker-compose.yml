@@ -1,0 +1,36 @@
+version: '3.4'
+
+services:
+  tests:
+    build:
+      context: .
+      dockerfile: ./compose/tests/Dockerfile
+    image: tests_main
+    container_name: tests_main
+    entrypoint: >
+      sh -c "python /functional/utils/wait_for_redis.py
+      && python /functional/utils/wait_for_es.py"
+    volumes:
+    - ./src:/tests
+    depends_on:
+      - elastic
+      - redis
+
+  redis:
+    image: redis:6-buster
+    container_name: tests_redis
+    volumes:
+    - redis_data:/data
+
+  elastic:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.13.4
+    container_name: tests_elastic
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
+    volumes:
+    - es_data:/usr/share/elasticsearch/data
+
+volumes:
+  es_data:
+  redis_data:
