@@ -26,7 +26,6 @@ exc = (ConnectionRefusedError, NewConnectionError, es_exceptions.ConnectionError
 def wait_for_es():
     counter = 0
     while counter < MAX_ATTEMPTS:
-        breakpoint()
         try:
             counter += 1
             client = Elasticsearch(hosts=settings.ELASTIC_HOST)
