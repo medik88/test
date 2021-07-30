@@ -1,3 +1,4 @@
+import logging
 import uuid
 from functools import lru_cache
 from typing import Optional
@@ -7,9 +8,12 @@ from elasticsearch import exceptions as es_exceptions
 from fastapi import Depends
 
 from core import config
-from db.elastic import get_elastic, WrappedAsyncElasticsearch
-from db.redis import get_redis, redis_cache
+from core.exceptions import NotFoundError
+from db.elastic import WrappedAsyncElasticsearch, get_elastic
+from db.redis import get_redis
 from models.film import Film
+
+logger = logging.getLogger(__name__)
 
 
 class FilmService:
@@ -42,15 +46,20 @@ class FilmService:
                 'genres_ids': genre_id
             }}]
 
-        resp = await self.elastic.search(
-            index=config.ELASTIC_MOVIES_INDEX,
-            body=body,
-            size=page_size,
-            from_=page_number * page_size,
-        )
+        try:
+            resp = await self.elastic.search(
+                index=config.ELASTIC_MOVIES_INDEX,
+                body=body,
+                size=page_size,
+                from_=page_number * page_size,
+            )
+        except es_exceptions.NotFoundError as e:
+            raise NotFoundError
+
         try:
             return [Film(uuid=f['_id'], **f['_source']) for f in resp['hits']['hits']]
         except KeyError:
+            logger.error('Something wrong happened')
             return []
 
     @staticmethod
@@ -69,37 +78,43 @@ class FilmService:
 
     async def search(
             self, query: str, page_number: int = 1, page_size: int = None
-    ) -> list[Film]:
-        resp = await self.elastic.search(
-            index=config.ELASTIC_MOVIES_INDEX,
-            body={
-                'query': {
-                    'multi_match': {
-                        'query': query,
-                        'fields': [
-                            'title',
-                            'description',
-                            'actors_names',
-                            'directors_names',
-                            'writers_names',
-                        ],
-                    }
+    ) -> Optional[list[Film]]:
+        try:
+            resp = await self.elastic.search(
+                index=config.ELASTIC_MOVIES_INDEX,
+                body={
+                    'query': {
+                        'multi_match': {
+                            'query': query,
+                            'fields': [
+                                'title',
+                                'description',
+                                'actors_names',
+                                'directors_names',
+                                'writers_names',
+                            ],
+                        }
+                    },
+                    'sort': {'imdb_rating': {'order': 'desc'}},
                 },
-                'sort': {'imdb_rating': {'order': 'desc'}},
-            },
-            size=page_size,
-            from_=page_number * page_size,
-        )
+                size=page_size,
+                from_=page_number * page_size,
+            )
+        except es_exceptions.NotFoundError as e:
+            raise NotFoundError(e.error)
+
         try:
             return [Film(uuid=f['_id'], **f['_source']) for f in resp['hits']['hits']]
         except KeyError:
-            return []
+            logger.error('Something wrong happened')
+            return None
 
     async def get_by_id(self, film_id: str) -> Optional[Film]:
         try:
             doc = await self.elastic.get(config.ELASTIC_MOVIES_INDEX, film_id)
-        except es_exceptions.NotFoundError:
-            return None
+        except es_exceptions.NotFoundError as e:
+            raise NotFoundError(e.error)
+        
         film = Film(**doc['_source'], uuid=doc['_id'])
         return film
             

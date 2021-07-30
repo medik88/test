@@ -14,8 +14,8 @@ class WrappedAsyncElasticsearch(AsyncElasticsearch):
         return await super().search(*args, **kwargs)
 
 
-
 async def get_elastic() -> WrappedAsyncElasticsearch:
     return es
+
 
 es: WrappedAsyncElasticsearch = None
