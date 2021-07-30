@@ -29,14 +29,15 @@ def wait_for_es():
         try:
             counter += 1
             client = Elasticsearch(hosts=settings.ELASTIC_HOST)
-            client.cluster.health(wait_for_status="yellow")
+            connected = client.ping()
+            if connected:
+                logger.info('SUCCESS! Connected to Elasticsearch in %s attempts.' % counter)
+                return
         except exc as e:
             logger.info('[ATTEMPT %s] Wating for Elasticsearch to become available...' % counter)
             sleep(1)
             continue
-        else:
-            logger.info('SUCCESS! Connected to Elasticsearch in %s attempts.' % counter)
-            return
+
     logger.error('Failed to establish connection to Elasticsearch.')
 
 

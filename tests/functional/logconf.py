@@ -1,5 +1,5 @@
 LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-LOG_DEFAULT_HANDLERS = ['silent', ]
+LOG_DEFAULT_HANDLERS = ['default', ]
 
 # https://docs.python.org/3/howto/logging.html
 # https://docs.python.org/3/howto/logging-cookbook.html
@@ -18,8 +18,10 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'verbose',
         },
-        'silent': {
+        'default': {
+            'level': 'INFO',
             'class': 'logging.NullHandler',
+            'formatter': 'verbose',
         }
     },
     'loggers': {
