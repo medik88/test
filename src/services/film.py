@@ -8,7 +8,7 @@ from elasticsearch import exceptions as es_exceptions
 from fastapi import Depends
 
 from core import config
-from core.exceptions import NoIndexError
+from core.exceptions import NotFoundError
 from db.elastic import WrappedAsyncElasticsearch, get_elastic
 from db.redis import get_redis
 from models.film import Film
@@ -53,8 +53,8 @@ class FilmService:
                 size=page_size,
                 from_=page_number * page_size,
             )
-        except es_exceptions.NotFoundError:
-            raise NoIndexError
+        except es_exceptions.NotFoundError as e:
+            raise NotFoundError
 
         try:
             return [Film(uuid=f['_id'], **f['_source']) for f in resp['hits']['hits']]
@@ -100,8 +100,8 @@ class FilmService:
                 size=page_size,
                 from_=page_number * page_size,
             )
-        except es_exceptions.NotFoundError:
-            raise NoIndexError
+        except es_exceptions.NotFoundError as e:
+            raise NotFoundError(e.error)
 
         try:
             return [Film(uuid=f['_id'], **f['_source']) for f in resp['hits']['hits']]
@@ -112,8 +112,8 @@ class FilmService:
     async def get_by_id(self, film_id: str) -> Optional[Film]:
         try:
             doc = await self.elastic.get(config.ELASTIC_MOVIES_INDEX, film_id)
-        except es_exceptions.NotFoundError:
-            return None
+        except es_exceptions.NotFoundError as e:
+            raise NotFoundError(e.error)
         
         film = Film(**doc['_source'], uuid=doc['_id'])
         return film

@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 
 from core import config
-from core.exceptions import NoIndexError
+from core.exceptions import NotFoundError
 from models.film import Film as ServiceFilm
 from services.film import FilmService, get_film_service
 
@@ -70,8 +70,8 @@ async def film_search_list(
 ) -> List[BaseFilm]:
     try:
         model_films = await film_service.search(query, page_number, page_size)
-    except NoIndexError:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='index not found')
+    except NotFoundError as e:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=e.error)
 
     if model_films is None:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='filmworks not found')
@@ -90,7 +90,11 @@ async def film_full_list(
         genre_id: UUID = Query(None, alias='filter[genre]'),
         film_service: FilmService = Depends(get_film_service)
 ) -> List[BaseFilm]:
-    model_films = await film_service.get_page(page_number, page_size, sort, genre_id)
+    try:
+        model_films = await film_service.get_page(page_number, page_size, sort, genre_id)
+    except NotFoundError as e:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=e.error)
+
     if model_films:
         return [BaseFilm(uuid=f.uuid, title=f.title, imdb_rating=f.imdb_rating) for f in model_films]
     return []
@@ -98,7 +102,11 @@ async def film_full_list(
 
 @router.get('/{uuid}', response_model=Film)
 async def film_details(uuid: str, film_service: FilmService = Depends(get_film_service)) -> Film:
-    film = await film_service.get_by_id(uuid)
+    try:
+        film = await film_service.get_by_id(uuid)
+    except NotFoundError as e:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=e.error)
+
     if not film:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='filmwork not found')
     return Film.from_service_model(film)
