@@ -9,7 +9,7 @@ from fastapi import Depends
 
 from core import config
 from core.exceptions import NoIndexError
-from db.elastic import get_elastic, WrappedAsyncElasticsearch
+from db.elastic import WrappedAsyncElasticsearch, get_elastic
 from db.redis import get_redis
 from models.film import Film
 

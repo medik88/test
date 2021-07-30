@@ -1,5 +1,5 @@
 from functools import lru_cache
-from typing import Optional, List
+from typing import List, Optional
 from uuid import UUID
 
 import elasticsearch
@@ -7,8 +7,8 @@ from aioredis import Redis
 from fastapi import Depends
 
 from core import config
-from db.elastic import get_elastic, WrappedAsyncElasticsearch
-from db.redis import get_redis, redis_cache
+from db.elastic import WrappedAsyncElasticsearch, get_elastic
+from db.redis import get_redis
 from models.film import Genre
 
 

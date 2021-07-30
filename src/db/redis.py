@@ -1,8 +1,8 @@
-import orjson
-
-from aioredis import Redis
 from functools import wraps
 from hashlib import sha1
+
+import orjson
+from aioredis import Redis
 
 from core.config import REDIS_CACHE_EXPIRE_S
 
