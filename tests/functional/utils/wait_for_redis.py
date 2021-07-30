@@ -23,20 +23,20 @@ exc = (ConnectionRefusedError, ConnectionError, redis_exceptions.ConnectionError
 
 def wait_for_redis():
     counter = 0
-    connected = False
 
-    while counter < MAX_ATTEMTS or connected:
+    while counter < MAX_ATTEMTS:
         try:
             counter += 1
             client = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
             connected = client.ping()
+            if connected:
+                logger.info('SUCCESS! Connected to Redis in %s attempts.' % counter)
+                return
         except exc as e:
             logger.info('[ATTEMPT %s] Wating for Redis to become available...' % counter)
             sleep(1)
             continue
-        else:
-            logger.info('SUCCESS! Connected to Redis in %s attempts.' % counter)
-            return
+
     logger.error('Failed to establish connection to Redis.')
 
 
