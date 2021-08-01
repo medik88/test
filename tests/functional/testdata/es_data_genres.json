@@ -1,0 +1,76 @@
+{
+  "data": [
+    {
+      "_index": "genres",
+      "_op_type": "index",
+      "_id": "0de7d079-2ddc-4c4a-9fb8-7d89bc7b53f3",
+      "_source": {
+        "name": "драма",
+        "modified": "2021-08-01T10:08:02.053954+00:00"
+      }
+    },
+    {
+      "_index": "genres",
+      "_op_type": "index",
+      "_id": "b55362ff-3d30-4eeb-8cc9-63394c87af17",
+      "_source": {
+        "name": "криминал",
+        "modified": "2021-08-01T10:16:52.955417+00:00"
+      }
+    },
+    {
+      "_index": "genres",
+      "_op_type": "index",
+      "_id": "462211f1-6e01-4396-8ebb-eea091cf4717",
+      "_source": {
+        "name": "триллер",
+        "modified": "2021-08-01T10:19:01.299295+00:00"
+      }
+    },
+    {
+      "_index": "genres",
+      "_op_type": "index",
+      "_id": "193ff990-3b36-4ee5-8c71-c778049bc27e",
+      "_source": {
+        "name": "комедия",
+        "modified": "2021-08-01T10:12:35.799859+00:00"
+      }
+    },
+    {
+      "_index": "genres",
+      "_op_type": "index",
+      "_id": "6ed53799-b58f-4bf1-abbe-f6819d43cd7c",
+      "_source": {
+        "name": "мелодрама",
+        "modified": "2021-08-01T10:12:46.528427+00:00"
+      }
+    },
+    {
+      "_index": "genres",
+      "_op_type": "index",
+      "_id": "71368e24-c61a-4cbe-a040-f37db10b1ff3",
+      "_source": {
+        "name": "история",
+        "modified": "2021-08-01T10:20:39.962927+00:00"
+      }
+    },
+    {
+      "_index": "genres",
+      "_op_type": "index",
+      "_id": "a4ce5b04-77cb-4ed8-a3b4-6383aae734d1",
+      "_source": {
+        "name": "вестерн",
+        "modified": "2021-08-01T10:32:23.979865+00:00"
+      }
+    },
+    {
+      "_index": "genres",
+      "_op_type": "index",
+      "_id": "a6191006-cf0e-495e-b632-a3a542234fb7",
+      "_source": {
+        "name": "боевик",
+        "modified": "2021-08-01T10:14:53.876284+00:00"
+      }
+    }
+  ]
+}

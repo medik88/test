@@ -1,0 +1,157 @@
+{
+  "data": [
+    {
+      "_index": "persons",
+      "_op_type": "index",
+      "_id": "c3fbdcf1-ead1-4dd6-8169-4f5151005487",
+      "_source": {
+        "name": "Брэд Питт",
+        "modified": "2021-08-01T10:27:49.234928+00:00"
+      }
+    },
+    {
+      "_index": "persons",
+      "_op_type": "index",
+      "_id": "f4cc5b5d-885e-4295-93ff-7d58f68ac802",
+      "_source": {
+        "name": "Барри Левинсон",
+        "modified": "2021-08-01T10:09:49.271025+00:00"
+      }
+    },
+    {
+      "_index": "persons",
+      "_op_type": "index",
+      "_id": "00a87f5a-8f10-4e70-9489-7f4644d28f5b",
+      "_source": {
+        "name": "Сидни Поллак",
+        "modified": "2021-08-01T10:14:20.219940+00:00"
+      }
+    },
+    {
+      "_index": "persons",
+      "_op_type": "index",
+      "_id": "129d5c51-016b-4b78-bcf2-777c900bd2a8",
+      "_source": {
+        "name": "Мэтт ЛеБлан",
+        "modified": "2021-08-01T10:24:04.749258+00:00"
+      }
+    },
+    {
+      "_index": "persons",
+      "_op_type": "index",
+      "_id": "32b04954-f844-44ba-a52e-a752d6d6fded",
+      "_source": {
+        "name": "Дженифер Энистон",
+        "modified": "2021-08-01T10:25:45.894753+00:00"
+      }
+    },
+    {
+      "_index": "persons",
+      "_op_type": "index",
+      "_id": "3a8b4192-5c41-4402-bb82-7faaaaa59efa",
+      "_source": {
+        "name": "Терес Уинтер",
+        "modified": "2021-08-01T10:18:17.705220+00:00"
+      }
+    },
+    {
+      "_index": "persons",
+      "_op_type": "index",
+      "_id": "aa303659-eafb-40a4-a673-09b1c424551d",
+      "_source": {
+        "name": "Марк Райдер",
+        "modified": "2021-08-01T10:22:16.120010+00:00"
+      }
+    },
+    {
+      "_index": "persons",
+      "_op_type": "index",
+      "_id": "73859cb2-befb-415d-9a8d-2ec9ea5218e9",
+      "_source": {
+        "name": "Эдвард Цвик",
+        "modified": "2021-08-01T10:16:04.151947+00:00"
+      }
+    },
+    {
+      "_index": "persons",
+      "_op_type": "index",
+      "_id": "eec1c754-1da0-4498-9215-e750103df3e6",
+      "_source": {
+        "name": "Изольда Дюшаук",
+        "modified": "2021-08-01T10:22:42.925258+00:00"
+      }
+    },
+    {
+      "_index": "persons",
+      "_op_type": "index",
+      "_id": "198820fe-af66-4bf3-91d4-fa476e38f3f1",
+      "_source": {
+        "name": "Мартин Скорсезе",
+        "modified": "2021-08-01T10:18:32.336672+00:00"
+      }
+    },
+    {
+      "_index": "persons",
+      "_op_type": "index",
+      "_id": "9e12c9d2-aa2d-46f4-9418-408d39380ee7",
+      "_source": {
+        "name": "Джона Хилл",
+        "modified": "2021-08-01T10:17:42.510025+00:00"
+      }
+    },
+    {
+      "_index": "persons",
+      "_op_type": "index",
+      "_id": "3f4f47c7-a084-41b9-a43f-7b1d243180f1",
+      "_source": {
+        "name": "Том Круз",
+        "modified": "2021-08-01T10:08:38.994848+00:00"
+      }
+    },
+    {
+      "_index": "persons",
+      "_op_type": "index",
+      "_id": "4d1e6c90-9f58-4de1-a534-68bff88c5f57",
+      "_source": {
+        "name": "Энн Райс",
+        "modified": "2021-08-01T10:28:06.734711+00:00"
+      }
+    },
+    {
+      "_index": "persons",
+      "_op_type": "index",
+      "_id": "e5d9ea49-b3a0-4e18-8e89-e13c2f9f43c4",
+      "_source": {
+        "name": "Нил Джордан",
+        "modified": "2021-08-01T10:28:23.214534+00:00"
+      }
+    },
+    {
+      "_index": "persons",
+      "_op_type": "index",
+      "_id": "21275dbc-a7a9-4713-805c-29d7c6d6de2a",
+      "_source": {
+        "name": "Дастин Хоффман",
+        "modified": "2021-08-01T10:09:15.059849+00:00"
+      }
+    },
+    {
+      "_index": "persons",
+      "_op_type": "index",
+      "_id": "60b36251-5295-4e64-992e-bf466e7f3892",
+      "_source": {
+        "name": "Бэрри Морроу",
+        "modified": "2021-08-01T10:10:40.558548+00:00"
+      }
+    },
+    {
+      "_index": "persons",
+      "_op_type": "index",
+      "_id": "94b2c8c9-89cb-4cd6-b1ff-344fa825a899",
+      "_source": {
+        "name": "Леонардо ДиКаприо",
+        "modified": "2021-08-01T10:17:27.556726+00:00"
+      }
+    }
+  ]
+}
