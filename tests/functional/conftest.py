@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from importlib import resources
 
 import aiohttp
+import aioredis
 import pytest
 from elasticsearch import AsyncElasticsearch
 from elasticsearch.helpers import async_bulk
@@ -33,6 +34,14 @@ def event_loop():
     res._close()
 
 
+@pytest.fixture()
+async def clear_cache():
+    redis = await aioredis.create_redis_pool((settings.REDIS_HOST, settings.REDIS_PORT), minsize=10, maxsize=20)
+    redis.flushall()
+    yield
+    redis.close()
+
+
 @pytest.fixture(scope='session')
 async def es_client():
     client = AsyncElasticsearch(hosts=settings.ELASTIC_HOST)
@@ -45,12 +54,11 @@ async def es_client_with_data(es_client):
     await es_client.indices.delete('*')
 
     async def load_from_resource(schema_file_name: str, data_file_name: str, index_name: str):
-        with resources.open_text('testdata', schema_file_name) as schema:
+        with resources.open_text('functional.testdata', schema_file_name) as schema:
             await es_client.indices.create(index_name, schema.read())
 
-        with resources.open_text('testdata', data_file_name) as file:
-            data = file.read()
-            items = json.loads(data)
+        with resources.open_text('functional.testdata', data_file_name) as file:
+            items = json.load(file)
             await async_bulk(es_client, items['data'])
 
     await load_from_resource('es_schema_genres.json', 'es_data_genres.json', settings.ELASTIC_GENRES_INDEX)
