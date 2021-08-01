@@ -11,16 +11,20 @@ services:
       sh -c "python /functional/utils/wait_for_redis.py
       && python /functional/utils/wait_for_es.py"
     volumes:
-    - ./src:/tests
+      - ./src:/tests
     depends_on:
       - elastic
       - redis
+    ports: 
+      - 8000:8000
 
   redis:
     image: redis:6-buster
     container_name: tests_redis
     volumes:
-    - redis_data:/data
+      - redis_data:/data
+    ports: 
+      - 6379:6379
 
   elastic:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.13.4
@@ -29,7 +33,9 @@ services:
       - discovery.type=single-node
       - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
     volumes:
-    - es_data:/usr/share/elasticsearch/data
+      - es_data:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
 
 volumes:
   es_data:

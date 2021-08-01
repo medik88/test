@@ -1,4 +1,4 @@
-FROM python:3.9-slim-buster
+FROM fastapi_image
 
 WORKDIR /tests
 
