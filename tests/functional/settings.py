@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     REDIS_DB: str = 0
     REDIS_PORT: str = '6379'
     SERVICE_URL: str = 'http://api:8000'
-
+    CACHE_BOOST_RATIO = 1.1
     ELASTIC_MOVIES_INDEX: str = 'movies'
     ELASTIC_PERSONS_INDEX: str = 'persons'
     ELASTIC_GENRES_INDEX: str = 'genres'

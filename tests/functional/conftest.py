@@ -34,7 +34,7 @@ def event_loop():
     res._close()
 
 
-@pytest.fixture()
+@pytest.fixture(autouse=True)
 async def clear_cache():
     redis = await aioredis.create_redis_pool((settings.REDIS_HOST, settings.REDIS_PORT), minsize=10, maxsize=20)
     redis.flushall()
@@ -54,10 +54,10 @@ async def es_client_with_data(es_client):
     await es_client.indices.delete('*')
 
     async def load_from_resource(schema_file_name: str, data_file_name: str, index_name: str):
-        with resources.open_text('functional.testdata', schema_file_name) as schema:
+        with resources.open_text('testdata', schema_file_name) as schema:
             await es_client.indices.create(index_name, schema.read())
 
-        with resources.open_text('functional.testdata', data_file_name) as file:
+        with resources.open_text('testdata', data_file_name) as file:
             items = json.load(file)
             await async_bulk(es_client, items['data'])
 
