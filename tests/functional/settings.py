@@ -10,6 +10,10 @@ class Settings(BaseSettings):
     REDIS_PORT: str = '6379'
     SERVICE_URL: str = 'http://api:8000'
 
+    ELASTIC_MOVIES_INDEX: str = 'movies'
+    ELASTIC_PERSONS_INDEX: str = 'persons'
+    ELASTIC_GENRES_INDEX: str = 'genres'
+
     class Config:
         # search .env file in current dir
         env_file = pathlib.Path(__file__).parent.resolve() / '.env'
