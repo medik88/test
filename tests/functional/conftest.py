@@ -1,7 +1,7 @@
 import asyncio
 import json
+import pathlib
 from dataclasses import dataclass
-from importlib import resources
 
 import aiohttp
 import aioredis
@@ -49,15 +49,19 @@ async def es_client():
     await client.close()
 
 
+def get_testdata_dir():
+    return pathlib.Path(__file__).parent / 'testdata'
+
+
 @pytest.fixture(scope='session')
 async def es_client_with_data(es_client):
     await es_client.indices.delete('*')
 
     async def load_from_resource(schema_file_name: str, data_file_name: str, index_name: str):
-        with resources.open_text('testdata', schema_file_name) as schema:
+        with open(get_testdata_dir() / schema_file_name, encoding='utf-8') as schema:
             await es_client.indices.create(index_name, schema.read())
 
-        with resources.open_text('testdata', data_file_name) as file:
+        with open(get_testdata_dir() / data_file_name, encoding='utf-8') as file:
             items = json.load(file)
             await async_bulk(es_client, items['data'])
 
@@ -75,7 +79,7 @@ async def session():
     await session.close()
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def make_get_request(session):
     async def inner(method: str, params: dict = None) -> HTTPResponse:
         params = params or {}

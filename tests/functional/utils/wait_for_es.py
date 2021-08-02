@@ -1,16 +1,10 @@
 import logging
-import os
-import sys
 from logging import config as logging_config
 from time import sleep
 
 from elasticsearch import Elasticsearch
 from elasticsearch import exceptions as es_exceptions
 from urllib3.exceptions import NewConnectionError
-
-# Todo: remove this temporary hack
-tests_root = os.path.abspath(os.path.pardir)
-sys.path.append(tests_root)
 
 from functional.logconf import LOGGING
 from functional.settings import settings
@@ -31,12 +25,20 @@ def wait_for_es():
             client = Elasticsearch(hosts=settings.ELASTIC_HOST)
             connected = client.ping()
             if connected:
-                logger.info('SUCCESS! Connected to Elasticsearch in %s attempts.' % counter)
+                logger.info(
+                    'SUCCESS! Connected to Elasticsearch in %s attempts.' % counter
+                )
                 return
         except exc as e:
-            logger.info('[ATTEMPT %s] Wating for Elasticsearch to become available...' % counter)
+            logger.info(
+                '[ATTEMPT %s] Wating for Elasticsearch to become available...' % counter
+            )
             sleep(1)
-            continue
+        else:
+            logger.info(
+                '[ATTEMPT %s] Wating for Elasticsearch to become available...' % counter
+            )
+            sleep(1)
 
     logger.error('Failed to establish connection to Elasticsearch.')
 
