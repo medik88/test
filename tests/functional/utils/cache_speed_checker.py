@@ -1,6 +1,6 @@
 import time
 
-from settings import settings
+from functional.settings import settings
 
 
 async def check_cache_speed(func, *args, **kwargs):

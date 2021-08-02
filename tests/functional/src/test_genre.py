@@ -1,7 +1,7 @@
 import pytest
 from jsonschema import validate
 
-from utils.cache_speed_checker import check_cache_speed
+from functional.utils.cache_speed_checker import check_cache_speed
 
 genre_schema = {
     "type": "object",
