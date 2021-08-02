@@ -37,9 +37,10 @@ def event_loop():
 @pytest.fixture(autouse=True)
 async def clear_cache():
     redis = await aioredis.create_redis_pool((settings.REDIS_HOST, settings.REDIS_PORT), minsize=10, maxsize=20)
-    redis.flushall()
+    await redis.flushall()
     yield
     redis.close()
+    await redis.wait_closed()
 
 
 @pytest.fixture(scope='session')
