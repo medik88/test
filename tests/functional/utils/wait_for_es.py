@@ -1,16 +1,10 @@
 import logging
-import os
-import sys
 from logging import config as logging_config
 from time import sleep
 
 from elasticsearch import Elasticsearch
 from elasticsearch import exceptions as es_exceptions
 from urllib3.exceptions import NewConnectionError
-
-# Todo: remove this temporary hack
-tests_root = os.path.abspath(os.path.pardir)
-sys.path.append(tests_root)
 
 from functional.logconf import LOGGING
 from functional.settings import settings
