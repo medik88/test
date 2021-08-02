@@ -1,15 +1,9 @@
 import logging
-import os
-import sys
 from logging import config as logging_config
 from time import sleep
 
 import redis
 from redis import exceptions as redis_exceptions
-
-# Todo: remove this temporary hack
-tests_root = os.path.abspath(os.path.pardir)
-sys.path.append(tests_root)
 
 from functional.logconf import LOGGING
 from functional.settings import settings
