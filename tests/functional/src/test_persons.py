@@ -85,7 +85,9 @@ async def test_person_without_films(event_loop, es_client_with_data, make_get_re
 
 
 @pytest.mark.asyncio
-async def test_person_with_empty_films(event_loop, es_client_with_data, make_get_request):
+async def test_person_with_empty_films(
+    event_loop, es_client_with_data, make_get_request
+):
     uuid_of_person_without_films = 'e633200c-666a-454a-a721-5b807d991fa6'
 
     response = await make_get_request(f'/person/{uuid_of_person_without_films}/film/')
