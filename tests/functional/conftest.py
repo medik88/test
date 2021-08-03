@@ -56,17 +56,16 @@ def get_testdata_dir():
 
 @pytest.fixture(scope='session')
 async def es_client_with_data(es_client):
-    await es_client.indices.delete(settings.ELASTIC_MOVIES_INDEX)
-    await es_client.indices.delete(settings.ELASTIC_PERSONS_INDEX)
-    await es_client.indices.delete(settings.ELASTIC_GENRES_INDEX)
-
     async def load_from_resource(schema_file_name: str, data_file_name: str, index_name: str):
+        if await es_client.indices.exists(index_name):
+            await es_client.indices.delete(index_name)
+
         with open(get_testdata_dir() / schema_file_name, encoding='utf-8') as schema:
             await es_client.indices.create(index_name, schema.read())
 
         with open(get_testdata_dir() / data_file_name, encoding='utf-8') as file:
             items = json.load(file)
-            await async_bulk(es_client, items['data'])
+            await async_bulk(es_client, items['data'], refresh=True)
 
     await load_from_resource('es_schema_genres.json', 'es_data_genres.json', settings.ELASTIC_GENRES_INDEX)
     await load_from_resource('es_schema_movies.json', 'es_data_movies.json', settings.ELASTIC_MOVIES_INDEX)
