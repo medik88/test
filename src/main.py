@@ -8,7 +8,7 @@ from fastapi.responses import ORJSONResponse
 from api.v1 import film, genre, person
 from core import config
 from core.logger import LOGGING
-from db import elastic, redis
+from db import elastic, cache
 from db.elastic import WrappedAsyncElasticsearch
 
 app = FastAPI(
@@ -21,13 +21,15 @@ app = FastAPI(
 
 @app.on_event('startup')
 async def startup():
-    redis.redis = await aioredis.create_redis_pool((config.REDIS_HOST, config.REDIS_PORT), minsize=10, maxsize=20)
+    cache.redis_instance = await aioredis.create_redis_pool((config.REDIS_HOST, config.REDIS_PORT), minsize=10,
+                                                            maxsize=20)
+    cache.redis_cache_instance = cache.RedisCache(cache.redis_instance)
     elastic.es = WrappedAsyncElasticsearch(hosts=[f'{config.ELASTIC_HOST}:{config.ELASTIC_PORT}'])
 
 
 @app.on_event('shutdown')
 async def shutdown():
-    await redis.redis.close()
+    await cache.redis_instance.close()
     await elastic.es.close()
 
 

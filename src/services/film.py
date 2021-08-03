@@ -3,22 +3,19 @@ import uuid
 from functools import lru_cache
 from typing import Optional
 
-from aioredis import Redis
 from elasticsearch import exceptions as es_exceptions
 from fastapi import Depends
 
 from core import config
 from core.exceptions import NotFoundError
 from db.elastic import WrappedAsyncElasticsearch, get_elastic
-from db.redis import get_redis
 from models.film import Film
 
 logger = logging.getLogger(__name__)
 
 
 class FilmService:
-    def __init__(self, redis: Redis, elastic: WrappedAsyncElasticsearch):
-        self.redis = redis
+    def __init__(self, elastic: WrappedAsyncElasticsearch):
         self.elastic = elastic
 
     async def get_page(
@@ -114,14 +111,13 @@ class FilmService:
             doc = await self.elastic.get(config.ELASTIC_MOVIES_INDEX, film_id)
         except es_exceptions.NotFoundError as e:
             raise NotFoundError(e.error)
-        
+
         film = Film(**doc['_source'], uuid=doc['_id'])
         return film
-            
+
 
 @lru_cache()
 def get_film_service(
-        redis: Redis = Depends(get_redis),
         elastic: WrappedAsyncElasticsearch = Depends(get_elastic),
 ) -> FilmService:
-    return FilmService(redis, elastic)
+    return FilmService(elastic)

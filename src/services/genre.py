@@ -3,19 +3,16 @@ from typing import List, Optional
 from uuid import UUID
 
 import elasticsearch
-from aioredis import Redis
 from fastapi import Depends
 
 from core import config
 from core.exceptions import NotFoundError
 from db.elastic import WrappedAsyncElasticsearch, get_elastic
-from db.redis import get_redis
 from models.film import Genre
 
 
 class GenreService:
-    def __init__(self, redis: Redis, elastic: WrappedAsyncElasticsearch):
-        self.redis = redis
+    def __init__(self, elastic: WrappedAsyncElasticsearch):
         self.elastic = elastic
 
     async def get_by_id(self, genre_id: UUID) -> Optional[Genre]:
@@ -37,7 +34,6 @@ class GenreService:
 
 @lru_cache()
 def get_genre_service(
-        redis: Redis = Depends(get_redis),
         elastic: WrappedAsyncElasticsearch = Depends(get_elastic),
 ) -> GenreService:
-    return GenreService(redis, elastic)
+    return GenreService(elastic)

@@ -1,15 +1,15 @@
 from elasticsearch import AsyncElasticsearch
 
-from db.redis import redis_cache
+from db.cache import cache_request
 
 
 class WrappedAsyncElasticsearch(AsyncElasticsearch):
 
-    @redis_cache
+    @cache_request
     async def get(self, *args, **kwargs):
         return await super().get(*args, **kwargs)
 
-    @redis_cache
+    @cache_request
     async def search(self, *args, **kwargs):
         return await super().search(*args, **kwargs)
 
