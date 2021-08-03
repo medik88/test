@@ -1,8 +1,21 @@
 from elasticsearch import AsyncElasticsearch
 
-es: AsyncElasticsearch = None
+from db.redis import redis_cache
 
 
-# Функция понадобится при внедрении зависимостей
-async def get_elastic() -> AsyncElasticsearch:
+class WrappedAsyncElasticsearch(AsyncElasticsearch):
+
+    @redis_cache
+    async def get(self, *args, **kwargs):
+        return await super().get(*args, **kwargs)
+
+    @redis_cache
+    async def search(self, *args, **kwargs):
+        return await super().search(*args, **kwargs)
+
+
+async def get_elastic() -> WrappedAsyncElasticsearch:
     return es
+
+
+es: WrappedAsyncElasticsearch = None
