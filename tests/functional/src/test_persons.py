@@ -73,6 +73,7 @@ async def test_person_with_films(event_loop, es_client_with_data, make_get_reque
     uuid_of_person_with_films = 'c3fbdcf1-ead1-4dd6-8169-4f5151005487'
 
     response = await make_get_request(f'/person/{uuid_of_person_with_films}/film/')
+    assert response.status == 200
     assert len(response.body) > 0
 
 
@@ -91,6 +92,7 @@ async def test_person_with_empty_films(
     uuid_of_person_without_films = 'e633200c-666a-454a-a721-5b807d991fa6'
 
     response = await make_get_request(f'/person/{uuid_of_person_without_films}/film/')
+    assert response.status == 200
     assert len(response.body) == 0
 
 
@@ -171,4 +173,5 @@ async def test_empty_search_result(event_loop, es_client_with_data, make_get_req
     params = {'query': 'нет таких'}
 
     response = await make_get_request('/person/search', params)
+    assert response.status == 200
     assert response.body == []
