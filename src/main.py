@@ -13,6 +13,8 @@ from db.elastic import WrappedAsyncElasticsearch
 
 app = FastAPI(
     title=config.PROJECT_NAME,
+    description=config.PROJECT_DESCRIPTION,
+    version=config.API_VERSION,
     docs_url='/api/openapi',
     openapi_url='/api/openapi.json',
     default_response_class=ORJSONResponse,
