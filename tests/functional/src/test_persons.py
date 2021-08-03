@@ -7,9 +7,6 @@ from jsonschema import validate
 
 from functional.logconf import LOGGING
 
-# from functional.utils.cache_speed_checker import check_cache_speed
-
-
 logging.config.dictConfig(LOGGING)
 logger = logging.getLogger(__name__)
 
@@ -88,7 +85,9 @@ async def test_person_without_films(event_loop, es_client_with_data, make_get_re
 
 
 @pytest.mark.asyncio
-async def test_person_films_with_random_uuid(event_loop, es_client_with_data, make_get_request):
+async def test_person_films_with_random_uuid(
+    event_loop, es_client_with_data, make_get_request
+):
     random_uuid = uuid.uuid4()
 
     response = await make_get_request(f'/person/{random_uuid}/film/')
@@ -96,7 +95,9 @@ async def test_person_films_with_random_uuid(event_loop, es_client_with_data, ma
 
 
 @pytest.mark.asyncio
-async def test_person_films_with_invalid_uuid(event_loop, es_client_with_data, make_get_request):
+async def test_person_films_with_invalid_uuid(
+    event_loop, es_client_with_data, make_get_request
+):
     invalid_uuid = 'invalid_uuid'
 
     response = await make_get_request(f'/person/{invalid_uuid}/film/')
