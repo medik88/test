@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from functools import wraps
 from hashlib import sha1
+from typing import Optional
 
 import orjson
 from aioredis import Redis
@@ -10,11 +11,11 @@ from core.config import REDIS_CACHE_EXPIRE_S
 
 class AbstractCache(ABC):
     @abstractmethod
-    async def get(self, key):
+    async def get(self, key: str) -> Optional[bytes]:
         pass
 
     @abstractmethod
-    async def set(self, key, value, expire):
+    async def set(self, key: str, value: bytes, expire: int):
         pass
 
 
@@ -22,10 +23,10 @@ class RedisCache(AbstractCache):
     def __init__(self, redis: Redis):
         self.redis = redis
 
-    async def get(self, key):
+    async def get(self, key: str) -> Optional[bytes]:
         return await self.redis.get(key)
 
-    async def set(self, key, value, expire):
+    async def set(self, key: str, value: bytes, expire: int):
         await self.redis.set(key, value, expire=expire)
 
 
