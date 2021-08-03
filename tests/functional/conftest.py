@@ -46,7 +46,9 @@ def get_testdata_dir():
 
 @pytest.fixture(scope='session')
 async def es_client_with_data(es_client):
-    await es_client.indices.delete('*')
+    await es_client.indices.delete(settings.ELASTIC_MOVIES_INDEX)
+    await es_client.indices.delete(settings.ELASTIC_PERSONS_INDEX)
+    await es_client.indices.delete(settings.ELASTIC_GENRES_INDEX)
 
     async def load_from_resource(schema_file_name: str, data_file_name: str, index_name: str):
         with open(get_testdata_dir() / schema_file_name, encoding='utf-8') as schema:
