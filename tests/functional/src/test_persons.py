@@ -7,7 +7,7 @@ from jsonschema import validate
 
 from functional.logconf import LOGGING
 
-logging.config.dictConfig(LOGGING)
+logging_config.dictConfig(LOGGING)
 logger = logging.getLogger(__name__)
 
 
@@ -112,3 +112,63 @@ async def test_person_films_with_invalid_uuid(
 
     response = await make_get_request(f'/person/{invalid_uuid}/film/')
     assert response.status == 422
+
+
+@pytest.mark.asyncio
+async def test_empty_search_query(event_loop, es_client_with_data, make_get_request):
+    params = {'query': ''}
+
+    response = await make_get_request('/person/search', params)
+    assert response.status == 422
+
+
+@pytest.mark.asyncio
+async def test_invalid_search_query(event_loop, es_client_with_data, make_get_request):
+    params = {'query': 'a'}
+
+    response = await make_get_request('/person/search', params)
+    assert response.status == 422
+
+
+@pytest.mark.asyncio
+async def test_invalid_page_number(event_loop, es_client_with_data, make_get_request):
+    params = {'query': 'foo', 'page[number]': 'invalid'}
+
+    response = await make_get_request('/person/search', params)
+    assert response.status == 422
+
+
+@pytest.mark.asyncio
+async def test_invalid_page_size(event_loop, es_client_with_data, make_get_request):
+    params = {'query': 'foo', 'page[size]': 'invalid'}
+
+    response = await make_get_request('/person/search', params)
+    assert response.status == 422
+
+
+@pytest.mark.asyncio
+async def test_search_all_params(event_loop, es_client_with_data, make_get_request):
+    params = {'query': 'брэд', 'page[number]': 1, 'page[size]': 50}
+
+    response = await make_get_request('/person/search', params)
+    assert response.status == 200
+    validate(instance=response.body, schema=person_list_schema)
+
+
+@pytest.mark.asyncio
+async def test_search_required_params(
+    event_loop, es_client_with_data, make_get_request
+):
+    params = {'query': 'Брэд'}
+
+    response = await make_get_request('/person/search', params)
+    assert response.status == 200
+    validate(instance=response.body, schema=person_list_schema)
+
+
+@pytest.mark.asyncio
+async def test_empty_search_result(event_loop, es_client_with_data, make_get_request):
+    params = {'query': 'нет таких'}
+
+    response = await make_get_request('/person/search', params)
+    assert response.body == []
