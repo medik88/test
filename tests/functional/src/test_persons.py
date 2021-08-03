@@ -78,9 +78,17 @@ async def test_person_with_films(event_loop, es_client_with_data, make_get_reque
 
 @pytest.mark.asyncio
 async def test_person_without_films(event_loop, es_client_with_data, make_get_request):
-    uuid_of_person_with_films = 'e633200c-666a-454a-a721-5b807d991fa6'
+    uuid_of_person_without_films = '5553b68a-5a2d-4b4d-bd21-a926e2f14741'
 
-    response = await make_get_request(f'/person/{uuid_of_person_with_films}/film/')
+    response = await make_get_request(f'/person/{uuid_of_person_without_films}/film/')
+    assert response.status == 404
+
+
+@pytest.mark.asyncio
+async def test_person_with_empty_films(event_loop, es_client_with_data, make_get_request):
+    uuid_of_person_without_films = 'e633200c-666a-454a-a721-5b807d991fa6'
+
+    response = await make_get_request(f'/person/{uuid_of_person_without_films}/film/')
     assert len(response.body) == 0
 
 
