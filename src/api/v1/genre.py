@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from core.exceptions import NotFoundError
-from services.genre import GenreService, get_genre_service
+from services.genre import AbstractGenreService, get_genre_service
 
 router = APIRouter()
 
@@ -17,7 +17,7 @@ class Genre(BaseModel):
 
 
 @router.get('/{uuid}', response_model=Genre)
-async def genre_details(uuid: UUID, genre_service: GenreService = Depends(get_genre_service)) -> Genre:
+async def genre_details(uuid: UUID, genre_service: AbstractGenreService = Depends(get_genre_service)) -> Genre:
     try:
         genre = await genre_service.get_by_id(uuid)
     except NotFoundError as e:
@@ -29,7 +29,7 @@ async def genre_details(uuid: UUID, genre_service: GenreService = Depends(get_ge
 
 
 @router.get('/', response_model=List[Genre])
-async def genre_list(genre_service: GenreService = Depends(get_genre_service)) -> List[Genre]:
+async def genre_list(genre_service: AbstractGenreService = Depends(get_genre_service)) -> List[Genre]:
     try:
         genres = await genre_service.get_all()
     except NotFoundError as e:

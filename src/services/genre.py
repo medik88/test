@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from functools import lru_cache
 from typing import List, Optional
 from uuid import UUID
@@ -11,7 +12,17 @@ from db.elastic import WrappedAsyncElasticsearch, get_elastic
 from models.film import Genre
 
 
-class GenreService:
+class AbstractGenreService(ABC):
+    @abstractmethod
+    async def get_by_id(self, genre_id: UUID) -> Optional[Genre]:
+        pass
+
+    @abstractmethod
+    async def get_all(self) -> List[Genre]:
+        pass
+
+
+class GenreService(AbstractGenreService):
     def __init__(self, elastic: WrappedAsyncElasticsearch):
         self.elastic = elastic
 
@@ -35,5 +46,5 @@ class GenreService:
 @lru_cache()
 def get_genre_service(
         elastic: WrappedAsyncElasticsearch = Depends(get_elastic),
-) -> GenreService:
+) -> AbstractGenreService:
     return GenreService(elastic)

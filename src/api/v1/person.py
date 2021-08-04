@@ -10,7 +10,7 @@ from core import config
 from core.exceptions import NotFoundError
 from models.film import FilmForPerson as ServiceFilmForPerson
 from models.film import Person as ServicePerson
-from services.person import PersonService, get_person_service
+from services.person import AbstractPersonService, get_person_service
 
 router = APIRouter()
 
@@ -55,7 +55,7 @@ async def person_search_list(
         query: str = Query(..., min_length=2),
         page_number: int = Query(1, alias='page[number]', ge=1),
         page_size: int = Query(config.PAGE_SIZE, alias='page[size]', ge=1),
-        person_service: PersonService = Depends(get_person_service)
+        person_service: AbstractPersonService = Depends(get_person_service)
 ) -> List[Person]:
     try:
         persons = await person_service.search_persons(query, page_number, page_size)
@@ -68,7 +68,7 @@ async def person_search_list(
 @router.get('/{uuid}', response_model=Person)
 async def person_details(
         uuid: UUID,
-        person_service: PersonService = Depends(get_person_service)
+        person_service: AbstractPersonService = Depends(get_person_service)
 ) -> Person:
     try:
         person = await person_service.get_by_id(uuid)
@@ -84,7 +84,7 @@ async def person_details(
 @router.get('/{uuid}/film', response_model=List[FilmForPerson])
 async def films_by_person(
         uuid: UUID,
-        person_service: PersonService = Depends(get_person_service)
+        person_service: AbstractPersonService = Depends(get_person_service)
 ) -> List[FilmForPerson]:
     try:
         films = await person_service.get_films_for_person(uuid)

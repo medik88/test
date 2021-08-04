@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from functools import lru_cache
 from typing import List, Optional
 from uuid import UUID
@@ -11,7 +12,21 @@ from db.elastic import WrappedAsyncElasticsearch, get_elastic
 from models.film import FilmForPerson, Person
 
 
-class PersonService:
+class AbstractPersonService(ABC):
+    @abstractmethod
+    async def get_by_id(self, person_id: UUID) -> Optional[Person]:
+        pass
+
+    @abstractmethod
+    async def get_films_for_person(self, person_id: UUID) -> List[FilmForPerson]:
+        pass
+
+    @abstractmethod
+    async def search_persons(self, query: str, page_number: int, page_size: int) -> List[Person]:
+        pass
+
+
+class PersonService(AbstractPersonService):
     def __init__(self, elastic: WrappedAsyncElasticsearch):
         self.elastic = elastic
 
@@ -60,5 +75,5 @@ class PersonService:
 @lru_cache()
 def get_person_service(
         elastic: WrappedAsyncElasticsearch = Depends(get_elastic),
-) -> PersonService:
+) -> AbstractPersonService:
     return PersonService(elastic)

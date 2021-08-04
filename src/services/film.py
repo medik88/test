@@ -1,5 +1,6 @@
 import logging
 import uuid
+from abc import ABC, abstractmethod
 from functools import lru_cache
 from typing import Optional
 
@@ -14,7 +15,29 @@ from models.film import Film
 logger = logging.getLogger(__name__)
 
 
-class FilmService:
+class AbstractFilmService(ABC):
+    @abstractmethod
+    async def get_page(
+            self,
+            page_number: int = 1,
+            page_size: int = None,
+            sort: str = None,
+            genre_id: uuid.UUID = None,
+    ) -> list[Film]:
+        pass
+
+    @abstractmethod
+    async def search(
+            self, query: str, page_number: int = 1, page_size: int = None
+    ) -> Optional[list[Film]]:
+        pass
+
+    @abstractmethod
+    async def get_by_id(self, film_id: str) -> Optional[Film]:
+        pass
+
+
+class FilmService(AbstractFilmService):
     def __init__(self, elastic: WrappedAsyncElasticsearch):
         self.elastic = elastic
 
@@ -119,5 +142,5 @@ class FilmService:
 @lru_cache()
 def get_film_service(
         elastic: WrappedAsyncElasticsearch = Depends(get_elastic),
-) -> FilmService:
+) -> AbstractFilmService:
     return FilmService(elastic)

@@ -9,7 +9,7 @@ from pydantic import BaseModel
 from core import config
 from core.exceptions import NotFoundError
 from models.film import Film as ServiceFilm
-from services.film import FilmService, get_film_service
+from services.film import AbstractFilmService, get_film_service
 
 router = APIRouter()
 
@@ -66,7 +66,7 @@ async def film_search_list(
         query: str = Query(..., min_length=2),
         page_number: typing.Optional[int] = Query(1, alias='page[number]', ge=1),
         page_size: typing.Optional[int] = Query(config.PAGE_SIZE, alias='page[size]', ge=1),
-        film_service: FilmService = Depends(get_film_service)
+        film_service: AbstractFilmService = Depends(get_film_service)
 ) -> List[BaseFilm]:
     try:
         model_films = await film_service.search(query, page_number, page_size)
@@ -88,7 +88,7 @@ async def film_full_list(
         page_size: typing.Optional[int] = Query(config.PAGE_SIZE, alias='page[size]', ge=1),
         sort: str = Query(None, regex='^-?(?:title|imdb_rating)$'),
         genre_id: UUID = Query(None, alias='filter[genre]'),
-        film_service: FilmService = Depends(get_film_service)
+        film_service: AbstractFilmService = Depends(get_film_service)
 ) -> List[BaseFilm]:
     try:
         model_films = await film_service.get_page(page_number, page_size, sort, genre_id)
@@ -101,7 +101,7 @@ async def film_full_list(
 
 
 @router.get('/{uuid}', response_model=Film)
-async def film_details(uuid: str, film_service: FilmService = Depends(get_film_service)) -> Film:
+async def film_details(uuid: str, film_service: AbstractFilmService = Depends(get_film_service)) -> Film:
     try:
         film = await film_service.get_by_id(uuid)
     except NotFoundError as e:
