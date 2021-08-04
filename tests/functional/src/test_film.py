@@ -182,8 +182,8 @@ async def test_get_film_list_sort_by_title(event_loop, es_client_with_data, make
     assert response.status == 200
     validate(instance=response.body, schema=film_list_schema)
     assert len(response.body) == 5
-    imdb_rating = [i['title'] for i in response.body]
-    assert imdb_rating == [
+    title = [i['title'] for i in response.body]
+    assert title == [
         'Загадочная история Бенджамина Баттона',
         'Интервью с вампиром',
         'Одиннадцать друзей Оушена',
@@ -198,8 +198,8 @@ async def test_get_film_list_sort_by_reverse_title(event_loop, es_client_with_da
     assert response.status == 200
     validate(instance=response.body, schema=film_list_schema)
     assert len(response.body) == 5
-    imdb_rating = [i['title'] for i in response.body]
-    assert imdb_rating == [
+    title = [i['title'] for i in response.body]
+    assert title == [
         'Одиннадцать друзей Оушена',
         'Интервью с вампиром',
         'Загадочная история Бенджамина Баттона',
@@ -265,7 +265,7 @@ async def test_get_film_with_empty_query(event_loop, es_client_with_data, make_g
 
     response = await make_get_request(f'/film/search?query={query}&page[number]=1&page[size]=5')
     assert response.status == 422
-# Послать запрос с query 2 символа, проверить что ошибка
+
 @pytest.mark.asyncio
 async def test_get_film_with_two_sumbols_query(event_loop, es_client_with_data, make_get_request):
     query = 'hb'
