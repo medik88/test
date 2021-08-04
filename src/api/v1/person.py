@@ -50,7 +50,14 @@ class Person(BaseModel):
         return person
 
 
-@router.get('/search', response_model=List[Person])
+@router.get(
+    '/search',
+    response_model=List[Person],
+    summary="Поиск персон",
+    description="Полнотекстовый поиск по персонам",
+    response_description="Имя и работы персоны",
+    tags=['Полнотекстовый поиск']
+)
 async def person_search_list(
         query: str = Query(..., min_length=2),
         page_number: int = Query(1, alias='page[number]', ge=1),
@@ -65,7 +72,13 @@ async def person_search_list(
     return [Person.from_service_model(person) for person in persons]
 
 
-@router.get('/{uuid}', response_model=Person)
+@router.get(
+    '/{uuid}',
+    response_model=Person,
+    summary="Информация по персоне",
+    description="Полная информация по персоне по её ID",
+    response_description="Имя и работы персоны"
+)
 async def person_details(
         uuid: UUID,
         person_service: PersonService = Depends(get_person_service)
@@ -81,7 +94,13 @@ async def person_details(
     return Person.from_service_model(person)
 
 
-@router.get('/{uuid}/film', response_model=List[FilmForPerson])
+@router.get(
+    '/{uuid}/film',
+    response_model=List[FilmForPerson],
+    summary="Работы персоны",
+    description="Список работ персоны по её ID",
+    response_description="Название и рейтинг фильма"
+)
 async def films_by_person(
         uuid: UUID,
         person_service: PersonService = Depends(get_person_service)

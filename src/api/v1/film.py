@@ -61,7 +61,14 @@ class Film(BaseFilm):
         return film
 
 
-@router.get('/search', response_model=List[BaseFilm])
+@router.get(
+    '/search',
+    response_model=List[BaseFilm],
+    summary="Поиск кинопроизведений",
+    description="Полнотекстовый поиск по кинопроизведениям",
+    response_description="Название и рейтинг фильма",
+    tags=['Полнотекстовый поиск']
+)
 async def film_search_list(
         query: str = Query(..., min_length=2),
         page_number: typing.Optional[int] = Query(1, alias='page[number]', ge=1),
@@ -82,7 +89,13 @@ async def film_search_list(
     return []
 
 
-@router.get('/', response_model=List[BaseFilm])
+@router.get(
+    '/',
+    response_model=List[BaseFilm],
+    summary="Список кинопроизведений",
+    description="Полный список кинопроизведений",
+    response_description="Название и рейтинг фильма"
+)
 async def film_full_list(
         page_number: typing.Optional[int] = Query(1, alias='page[number]', ge=1),
         page_size: typing.Optional[int] = Query(config.PAGE_SIZE, alias='page[size]', ge=1),
@@ -100,7 +113,13 @@ async def film_full_list(
     return []
 
 
-@router.get('/{uuid}', response_model=Film)
+@router.get(
+    '/{uuid}',
+    response_model=Film,
+    summary="Информация по кинопроизведению",
+    description="Полная информация по кинопроизведению по его ID",
+    response_description="Полная информация по фильму"
+)
 async def film_details(uuid: str, film_service: FilmService = Depends(get_film_service)) -> Film:
     try:
         film = await film_service.get_by_id(uuid)
