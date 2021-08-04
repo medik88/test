@@ -11,8 +11,23 @@ export REDIS_HOST="127.0.0.1"
 ELASTIC_HOST=127.0.0.1 REDIS_HOST=127.0.0.1 python main.py
 ```
 
+Подготавливаем
+
+```shell
+cd tests
+pip install -e .
+```
+
+После этого можно импортировать модули вот так
+
+```python
+from functional.logconf import LOGGING
+from functional.settings import settings
+```
+
 Запустить тесты
 
 ```shell
-make pytest
+cd tests/functional
+pytest src
 ```
