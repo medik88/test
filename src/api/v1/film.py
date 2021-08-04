@@ -120,7 +120,7 @@ async def film_full_list(
     description="Полная информация по кинопроизведению по его ID",
     response_description="Полная информация по фильму"
 )
-async def film_details(uuid: str, film_service: FilmService = Depends(get_film_service)) -> Film:
+async def film_details(uuid: UUID, film_service: FilmService = Depends(get_film_service)) -> Film:
     try:
         film = await film_service.get_by_id(uuid)
     except NotFoundError as e:
