@@ -34,7 +34,13 @@ pytest src
 
 # 1. Запуск тестов с помощью Docker
 
-Из каталога **functional**, где находится файл **docker-compose.py**, выполнить команду:
+Из каталога **functional**, где находится файл **docker-compose.py**, сначала собрать образы при необходимости:
+
+```shell
+docker-compose build
+```
+
+затем запустить
 
 ```shell
 docker-compose up
