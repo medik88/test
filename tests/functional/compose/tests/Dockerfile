@@ -2,7 +2,6 @@ FROM fastapi_image
 
 WORKDIR /tests
 
-COPY ./requirements.txt /requirements.txt
-RUN pip install pip -U && pip install -r /requirements.txt
+COPY . /tests
 
-COPY . /functional
+RUN pip install pip -U && pip install -r /tests/functional/requirements.txt --use-feature=in-tree-build

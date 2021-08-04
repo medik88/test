@@ -1,22 +1,28 @@
-version: '3.4'
+version: "3.4"
 
 services:
+  api:
+    build:
+      context: ../..
+      dockerfile: ./docker/api/Dockerfile
+    image: fastapi_image
+    container_name: tests_api
+    ports:
+      - "8000:8000"
+
   tests:
     build:
-      context: .
-      dockerfile: ./compose/tests/Dockerfile
+      context: ..
+      dockerfile: ./functional/compose/tests/Dockerfile
     image: tests_main
     container_name: tests_main
     entrypoint: >
-      sh -c "python /functional/utils/wait_for_redis.py
-      && python /functional/utils/wait_for_es.py"
-    volumes:
-      - ./src:/tests
+      sh -c "python /tests/functional/utils/wait_for_redis.py
+      && python /tests/functional/utils/wait_for_es.py
+      && pytest /tests/functional/src"
     depends_on:
       - elastic
       - redis
-    ports: 
-      - 8000:8000
 
   redis:
     image: redis:6-buster
@@ -24,7 +30,7 @@ services:
     volumes:
       - redis_data:/data
     ports: 
-      - 6379:6379
+      - "6379:6379"
 
   elastic:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.13.4
@@ -35,7 +41,7 @@ services:
     volumes:
       - es_data:/usr/share/elasticsearch/data
     ports:
-      - 9200:9200
+      - "9200:9200"
 
 volumes:
   es_data:
