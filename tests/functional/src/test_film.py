@@ -115,7 +115,7 @@ async def test_get_film_list_with_pagination(event_loop, es_client_with_data, ma
 
     assert response.status == 200
     validate(instance=response.body, schema=film_list_schema)
-    assert len(response.body) == 3
+    assert len(response.body) == 5
 
 @pytest.mark.asyncio
 async def test_get_film_list_not_valid_page(event_loop, es_client_with_data, make_get_request):
@@ -271,7 +271,9 @@ async def test_get_film_with_two_sumbols_query(event_loop, es_client_with_data, 
     query = 'hb'
 
     response = await make_get_request(f'/film/search?query={query}&page[number]=1&page[size]=5')
-    assert response.status == 422
+    assert response.status == 200
+    validate(instance=response.body, schema=film_list_schema)
+    assert len(response.body) == 0
 
 @pytest.mark.asyncio
 async def test_get_film_invalid_page_number_query(event_loop, es_client_with_data, make_get_request):
@@ -307,16 +309,16 @@ async def test_get_film_without_page_and_size_query(event_loop, es_client_with_d
 
 @pytest.mark.asyncio
 async def test_get_film_valid_with_pagination_query(event_loop, es_client_with_data, make_get_request):
-    query = 'человек'
+    query = 'кошка, которая гуляет сама по себе'
 
     response = await make_get_request(f'/film/search?query={query}&page[number]=2&page[size]=5')
     assert response.status == 200
     validate(instance=response.body, schema=film_list_schema)
-    assert len(response.body) == 5
+    assert len(response.body) == 1
 
 @pytest.mark.asyncio
 async def test_get_film_complex_query(event_loop, es_client_with_data, make_get_request):
-    query = 'кошка, которая гуляет сама по себе'
+    query = 'человек'
 
     response = await make_get_request(f'/film/search?query={query}&page[number]=1&page[size]=50')
     assert response.status == 200
