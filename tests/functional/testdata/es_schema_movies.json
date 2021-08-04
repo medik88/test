@@ -92,6 +92,9 @@
         "type": "text",
         "analyzer": "ru_en"
       },
+      "genres_ids": {
+        "type": "keyword"
+      },
       "actors": {
         "type": "nested",
         "dynamic": "strict",

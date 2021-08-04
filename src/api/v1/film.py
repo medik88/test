@@ -100,7 +100,7 @@ async def film_full_list(
         page_number: typing.Optional[int] = Query(1, alias='page[number]', ge=1),
         page_size: typing.Optional[int] = Query(config.PAGE_SIZE, alias='page[size]', ge=1),
         sort: str = Query(None, regex='^-?(?:title|imdb_rating)$'),
-        genre_id: UUID = Query(None, alias='filter[genre]'),
+        genre_id: typing.Optional[UUID] = Query(None, alias='filter[genre]'),
         film_service: FilmService = Depends(get_film_service)
 ) -> List[BaseFilm]:
     try:
