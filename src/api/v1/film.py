@@ -101,7 +101,7 @@ async def film_full_list(
 
 
 @router.get('/{uuid}', response_model=Film)
-async def film_details(uuid: str, film_service: FilmService = Depends(get_film_service)) -> Film:
+async def film_details(uuid: UUID, film_service: FilmService = Depends(get_film_service)) -> Film:
     try:
         film = await film_service.get_by_id(uuid)
     except NotFoundError as e:
