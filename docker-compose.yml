@@ -1,27 +1,30 @@
-version: '3'
+version: "3"
+
 services:
   redis:
     build: ./docker/redis/
     ports: 
-        - 6379:6379
+        - "6379:6379"
+
   elastic:
     build: ./docker/elastic/
     environment:
         - discovery.type=single-node
     ports: 
-        - 9200:9200
+        - "9200:9200"
     restart: always
+
   api:
     build:
         context: .
         dockerfile: ./docker/api/Dockerfile
     image: fastapi_image
-    command: python main.py
-    ports: 
-        - 8000:8000
+    ports:
+        - "8000:8000"
     restart: always
+
   nginx:
     build: ./docker/nginx/
     ports:
-        - 80:80
+        - "80:80"
     restart: always

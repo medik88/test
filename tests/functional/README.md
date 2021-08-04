@@ -31,3 +31,25 @@ from functional.settings import settings
 cd tests/functional
 pytest src
 ```
+
+# 1. Запуск тестов с помощью Docker
+
+Из каталога **functional**, где находится файл **docker-compose.py**, выполнить команду:
+
+```shell
+docker-compose up
+```
+
+Также, возможно, в целях отладки можно запустить окружение в контейнерах, а сам тест выполнить на хост-машине:
+
+```shell
+docker-compose up elastic redis api
+```
+
+а затем в отдельном терминале выполнить команду
+
+```shell
+pytest
+```
+
+предварительно активировав виртуальное окружение тестов (**tests/functional/requirements.txt**).

@@ -10,3 +10,5 @@ RUN pip install --upgrade pip \
 COPY src/ /app/
 
 EXPOSE 8000
+
+CMD ["python", "main.py"]
