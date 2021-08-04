@@ -19,36 +19,26 @@ class FilmService:
         self.elastic = elastic
 
     async def get_page(
-            self,
-            page_number: int = 1,
-            page_size: int = None,
-            sort: str = None,
-            genre_id: uuid.UUID = None,
+        self,
+        page_number: int = 1,
+        page_size: int = None,
+        sort: str = None,
+        genre_id: uuid.UUID = None,
     ) -> list[Film]:
-        body = {
-            'query': {
-                'bool': {
-                    'must': [
-                        {'match_all': {}}
-                    ]
-                }
-            }
-        }
+        body = {'query': {'bool': {'must': [{'match_all': {}}]}}}
 
         if sort is not None:
             body['sort'] = self._get_sorting(sort)
 
         if genre_id is not None:
-            body['query']['bool']['filter'] = [{'term': {
-                'genres_ids': genre_id
-            }}]
+            body['query']['bool']['filter'] = [{'term': {'genres_ids': genre_id}}]
 
         try:
             resp = await self.elastic.search(
                 index=config.ELASTIC_MOVIES_INDEX,
                 body=body,
                 size=page_size,
-                from_=page_number * page_size,
+                from_=(page_number - 1) * page_size,
             )
         except es_exceptions.NotFoundError as e:
             raise NotFoundError
@@ -74,7 +64,7 @@ class FilmService:
         return {sort_field: {'order': order}}
 
     async def search(
-            self, query: str, page_number: int = 1, page_size: int = None
+        self, query: str, page_number: int = 1, page_size: int = None
     ) -> Optional[list[Film]]:
         try:
             resp = await self.elastic.search(
@@ -95,7 +85,7 @@ class FilmService:
                     'sort': {'imdb_rating': {'order': 'desc'}},
                 },
                 size=page_size,
-                from_=page_number * page_size,
+                from_=(page_number - 1) * page_size,
             )
         except es_exceptions.NotFoundError as e:
             raise NotFoundError(e.error)
@@ -106,7 +96,7 @@ class FilmService:
             logger.error('Something wrong happened')
             return None
 
-    async def get_by_id(self, film_id: str) -> Optional[Film]:
+    async def get_by_id(self, film_id: uuid.UUID) -> Optional[Film]:
         try:
             doc = await self.elastic.get(config.ELASTIC_MOVIES_INDEX, film_id)
         except es_exceptions.NotFoundError as e:
@@ -118,6 +108,6 @@ class FilmService:
 
 @lru_cache()
 def get_film_service(
-        elastic: WrappedAsyncElasticsearch = Depends(get_elastic),
+    elastic: WrappedAsyncElasticsearch = Depends(get_elastic),
 ) -> FilmService:
     return FilmService(elastic)

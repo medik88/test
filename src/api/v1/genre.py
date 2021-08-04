@@ -16,7 +16,13 @@ class Genre(BaseModel):
     name: str
 
 
-@router.get('/{uuid}', response_model=Genre)
+@router.get(
+    '/{uuid}',
+    response_model=Genre,
+    summary="Информация по жанру",
+    description="Полная информация по жанру по его ID",
+    response_description="Название жанра"
+)
 async def genre_details(uuid: UUID, genre_service: GenreService = Depends(get_genre_service)) -> Genre:
     try:
         genre = await genre_service.get_by_id(uuid)
@@ -28,7 +34,13 @@ async def genre_details(uuid: UUID, genre_service: GenreService = Depends(get_ge
     return Genre(uuid=genre.uuid, name=genre.name)
 
 
-@router.get('/', response_model=List[Genre])
+@router.get(
+    '/',
+    response_model=List[Genre],
+    summary="Список жанров",
+    description="Полный список всех жанров",
+    response_description="Список названий жанров"
+)
 async def genre_list(genre_service: GenreService = Depends(get_genre_service)) -> List[Genre]:
     try:
         genres = await genre_service.get_all()
