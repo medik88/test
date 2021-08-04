@@ -84,6 +84,7 @@ async def session():
 @pytest.fixture(scope='function')
 def make_get_request(session):
     async def inner(method: str, params: dict = None) -> HTTPResponse:
+        assert method[0] == '/'
         params = params or {}
         url = settings.SERVICE_URL + '/api/v1' + method
         async with session.get(url, params=params) as response:

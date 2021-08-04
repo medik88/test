@@ -131,7 +131,7 @@ async def test_get_film_list_not_valid_pagesize(event_loop, es_client_with_data,
 
 @pytest.mark.asyncio
 async def test_get_film_list_valid_genre_filter(event_loop, es_client_with_data, make_get_request):
-    response = await make_get_request('film/?page[number]=1&page[size]=10&filter[genre]=0de7d079-2ddc-4c4a-9fb8-7d89bc7b53f3')
+    response = await make_get_request('/film/?page[number]=1&page[size]=10&filter[genre]=0de7d079-2ddc-4c4a-9fb8-7d89bc7b53f3')
 
     assert response.status == 200
     validate(instance=response.body, schema=film_list_schema)
@@ -139,77 +139,81 @@ async def test_get_film_list_valid_genre_filter(event_loop, es_client_with_data,
 
 @pytest.mark.asyncio
 async def test_get_film_list_genre_without_film_filter(event_loop, es_client_with_data, make_get_request):
-    response = await make_get_request('film/?page[number]=1&page[size]=10&filter[genre]=2311d522-c5ab-4b2d-9db0-5c3b88a61fb7')
+    response = await make_get_request('/film/?page[number]=1&page[size]=10&filter[genre]=2311d522-c5ab-4b2d-9db0-5c3b88a61fb7')
 
-    assert response.status == 404
+    assert response.status == 200
+    validate(instance=response.body, schema=film_list_schema)
+    assert len(response.body) == 0
 
 @pytest.mark.asyncio
 async def test_get_film_list_not_exists_genre_filter(event_loop, es_client_with_data, make_get_request):
-    response = await make_get_request('film/?page[number]=1&page[size]=10&filter[genre]=7ed7d079-2ddc-4c4a-9fb8-7d89bc7b54d5')
+    response = await make_get_request('/film/?page[number]=1&page[size]=10&filter[genre]=7ed7d079-2ddc-4c4a-9fb8-7d89bc7b54d5')
 
-    assert response.status == 404
+    assert response.status == 200
+    validate(instance=response.body, schema=film_list_schema)
+    assert len(response.body) == 0
 
 @pytest.mark.asyncio
 async def test_get_film_list_invalid_genre_filter(event_loop, es_client_with_data, make_get_request):
-    response = await make_get_request('film/?page[number]=1&page[size]=10&filter[genre]=abcdefgh')
+    response = await make_get_request('/film/?page[number]=1&page[size]=10&filter[genre]=abcdefgh')
 
     assert response.status == 422
 
 @pytest.mark.asyncio
 async def test_get_film_list_sort_by_imdb_rating(event_loop, es_client_with_data, make_get_request):
-    response = await make_get_request('film/?page[number]=1&page[size]=5&sort=imdb_rating')
+    response = await make_get_request('/film/?page[number]=1&page[size]=5&sort=imdb_rating')
 
     assert response.status == 200
     validate(instance=response.body, schema=film_list_schema)
     assert len(response.body) == 5
     imdb_rating = [i['imdb_rating'] for i in response.body]
-    assert imdb_rating == [7.8, 8, 8, 8, 8.2]
+    assert imdb_rating == [7.4, 7.5, 7.7, 7.7, 7.8]
 
 @pytest.mark.asyncio
 async def test_get_film_list_sort_by_reverse_imdb_rating(event_loop, es_client_with_data, make_get_request):
-    response = await make_get_request('film/?page[number]=1&page[size]=5&sort=-imdb_rating')
+    response = await make_get_request('/film/?page[number]=1&page[size]=5&sort=-imdb_rating')
 
     assert response.status == 200
     validate(instance=response.body, schema=film_list_schema)
     assert len(response.body) == 5
     imdb_rating = [i['imdb_rating'] for i in response.body]
-    assert imdb_rating == [8, 8, 7.8, 7.8, 7.7]
+    assert imdb_rating == [8.8, 8.8, 8.2, 8.2, 8.0]
 
 @pytest.mark.asyncio
 async def test_get_film_list_sort_by_title(event_loop, es_client_with_data, make_get_request):
-    response = await make_get_request('film/?page[number]=1&page[size]=5&sort=title')
+    response = await make_get_request('/film/?page[number]=1&page[size]=5&sort=title')
 
     assert response.status == 200
     validate(instance=response.body, schema=film_list_schema)
     assert len(response.body) == 5
     title = [i['title'] for i in response.body]
     assert title == [
-        'Загадочная история Бенджамина Баттона',
-        'Интервью с вампиром',
-        'Одиннадцать друзей Оушена',
-        'Остров проклятых',
-        'Последний самурай'
+        'Бойцовский клуб',
+        'Борджиа',
+        'Волк с Уолл-стрит',
+        'Выживший',
+        'Друзья'
     ]
 
 @pytest.mark.asyncio
 async def test_get_film_list_sort_by_reverse_title(event_loop, es_client_with_data, make_get_request):
-    response = await make_get_request('film/?page[number]=1&page[size]=5&sort=-title')
+    response = await make_get_request('/film/?page[number]=1&page[size]=5&sort=-title')
 
     assert response.status == 200
     validate(instance=response.body, schema=film_list_schema)
     assert len(response.body) == 5
     title = [i['title'] for i in response.body]
     assert title == [
-        'Одиннадцать друзей Оушена',
-        'Интервью с вампиром',
-        'Загадочная история Бенджамина Баттона',
-        'Друзья',
-        'Выживший'
+        'Человек дождя',
+        'Тутси',
+        'Терминатор',
+        'Последний самурай',
+        'Остров проклятых'
     ]
 
 @pytest.mark.asyncio
 async def test_get_film_list_invalid_sort(event_loop, es_client_with_data, make_get_request):
-    response = await make_get_request('film/?page[number]=1&page[size]=5&sort=43*3J')
+    response = await make_get_request('/film/?page[number]=1&page[size]=5&sort=43*3J')
 
     assert response.status == 422
 
