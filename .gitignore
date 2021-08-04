@@ -51,3 +51,6 @@ ENV/
 
 # auto generated docs
 doc.html
+
+# ide
+.vscode/
